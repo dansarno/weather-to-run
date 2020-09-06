@@ -1,5 +1,5 @@
 # Local keys
-bots/credentials.py
+credentials.py
 
 # Python files
 *.pyc
