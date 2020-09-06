@@ -1,0 +1,10 @@
+# Python files
+*.pyc
+*.pckl
+
+# Folders
+scratch/*
+venv/*
+
+# Other
+.idea
