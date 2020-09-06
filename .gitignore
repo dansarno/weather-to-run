@@ -1,3 +1,6 @@
+# Local keys
+bots/credentials.py
+
 # Python files
 *.pyc
 *.pckl
