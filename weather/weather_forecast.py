@@ -19,15 +19,14 @@ def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
 
     response = requests.get(url)
     full_response_dict = response.json()
-    minutely_forecast = full_response_dict["minutely"]
     hourly_forecast = full_response_dict["hourly"]
     daily_forecast = full_response_dict["daily"]
 
-    return minutely_forecast, hourly_forecast, daily_forecast
+    return hourly_forecast, daily_forecast
 
 
 def parse_hourly_forecast(hourly_forecast):
     pass
 
 
-minutes, hours, days = fetch_forecast(True)
+hours, days = fetch_forecast(True)
