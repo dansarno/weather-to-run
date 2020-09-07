@@ -26,7 +26,10 @@ def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
     return hourly_forecast, daily_forecast
 
 
-def aggregate_forecast_in_windows(hourly_forecast, time_windows):
+def group_forecasts_in_windows(hourly_forecast, time_windows):
+    morning_forecast = []
+    midday_forecast = []
+    afternoon_forecast = []
     for hour_forecast in hourly_forecast:
         this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
         is_next_day = datetime.now().day + 1 == this_datetime.day
@@ -36,12 +39,16 @@ def aggregate_forecast_in_windows(hourly_forecast, time_windows):
         if not is_next_day:
             continue
         if is_in_morning:
-            print("It's the morning!")
+            morning_forecast.append(hour_forecast)
         if is_in_midday:
-            print("Midday is it")
+            midday_forecast.append(hour_forecast)
         if is_in_afternoon:
-            print("Afternoon, sir!")
-    return None
+            afternoon_forecast.append(hour_forecast)
+    return morning_forecast, midday_forecast, afternoon_forecast
+
+
+def aggregate_forecast(hourly_forecast):
+    pass
 
 
 hours, days = fetch_forecast(True)
