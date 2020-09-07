@@ -28,19 +28,19 @@ def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
 
 def aggregate_forecast_in_windows(hourly_forecast, time_windows):
     for hour_forecast in hourly_forecast:
-        this_time_and_date = datetime.fromtimestamp(hour_forecast["dt"]).day
-        is_next_day = datetime.now().day + 1 == this_time_and_date
-        is_in_morning = False
-        is_in_midday = False
-        is_in_afternoon = False
+        this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
+        is_next_day = datetime.now().day + 1 == this_datetime.day
+        is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
+        is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
+        is_in_afternoon = time_windows["afternoon"][0].hour <= this_datetime.hour <= time_windows["afternoon"][1].hour
         if not is_next_day:
             continue
         if is_in_morning:
-            pass
+            print("It's the morning!")
         if is_in_midday:
-            pass
+            print("Midday is it")
         if is_in_afternoon:
-            pass
+            print("Afternoon, sir!")
     return None
 
 
