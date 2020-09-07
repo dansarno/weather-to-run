@@ -1,6 +1,7 @@
 import os
 import credentials as cred
 import requests
+from datetime import datetime
 import json
 
 
@@ -25,8 +26,21 @@ def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
     return hourly_forecast, daily_forecast
 
 
-def parse_hourly_forecast(hourly_forecast):
-    pass
+def aggregate_forecast_in_windows(hourly_forecast, time_windows):
+    for hour_forecast in hourly_forecast:
+        is_next_day = datetime.fromtimestamp(hour_forecast["dt"]).day == datetime.now().day + 1
+        is_in_morning = False
+        is_in_midday = False
+        is_in_afternoon = False
+        if not is_next_day:
+            continue
+        if is_in_morning:
+            pass
+        if is_in_midday:
+            pass
+        if is_in_afternoon:
+            pass
+    return None
 
 
 hours, days = fetch_forecast(True)
