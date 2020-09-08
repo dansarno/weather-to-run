@@ -64,19 +64,22 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     return morning_forecast, midday_forecast, evening_forecast, next_day_forecast
 
 
-def aggregate_forecast(hourly_forecast):
-    pass
+def score_forecast(hour_forecast):
+    temp_score = temp_c_to_score(hour_forecast["feels_like"])
+    wind_score = wind_speed_to_score(hour_forecast["wind_speed"])
+    precipitation_score = PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))]
+    return temp_score, wind_score, precipitation_score
 
 
 def wind_speed_to_score(wind_speed):
     # Empirical score (9-best, 0-worst) based off the Beaufort scale
-    score = 9 - ((wind_speed ** (7 / 6)) / 6)
-    return round(max(score, 0), 2)
+    score = 10 - ((wind_speed ** (7 / 6)) / 6)
+    return round(min(max(score, 0), 9), 2)
 
 
 def temp_c_to_score(temp_c):
     # Empirical score (9-best, 0-worst)
-    score = ((-0.023) * (temp_c - 20) ** 2) + 8.7
+    score = (-0.023 * (temp_c - 20) ** 2) + 9
     return round(min(max(score, 0), 9), 2)
 
 
