@@ -60,27 +60,51 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
             evening_forecast.append(hour_forecast)
 
     # TODO datetime.now() may be problematic for the deployed app
-    next_day_forecast = [day_forecast for day_forecast in daily_forecast
+    tomorrows_summary = [day_forecast for day_forecast in daily_forecast
                          if datetime.fromtimestamp(day_forecast["dt"]).day == datetime.now().day + 1][0]
 
-    return morning_forecast, midday_forecast, evening_forecast, next_day_forecast
+    return [morning_forecast, midday_forecast, evening_forecast], tomorrows_summary
 
 
-def aggregate_scores(hourly_forecast):
-    all_scores = [score_forecast(hour_forecast) for hour_forecast in hourly_forecast]
-    lowest_score_and_type = [(min(score), score.index(min(score))) for score in all_scores]
-    return lowest_score_and_type
+def aggregate_scores(hourly_forecast, what_to_score):
+    all_scores = [score_forecast(hour_forecast, what_to_score) for hour_forecast in hourly_forecast]
+    lowest_scores_and_reasons = [(min(score), score.index(min(score))) for score in all_scores]
+    return lowest_scores_and_reasons
+
+
+def score_window_and_why(lowest_scores_and_reasons, weather_parameters):
+    lowest_score = 10
+    worst_parameter = ""
+    for score, reason in lowest_scores_and_reasons:
+        if score < lowest_score:
+            lowest_score = score
+            worst_parameter = weather_parameters[reason]
+    return lowest_score, worst_parameter
 
 
 def when_to_run():
-    pass
+    hourly_forecast, daily_forecast = fetch_forecast(True)
+    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, TIME_WINDOWS)
+    highest_score = -1
+    best_time_id = 2  # evening by default, likely need changing
+    for i, forecast in enumerate(windowed_forecasts):
+        this_windows_score = score_window_and_why(aggregate_scores(forecast, WEATHER_PARAMETERS), WEATHER_PARAMETERS)[0]
+        is_a_better_time = highest_score < this_windows_score
+        if is_a_better_time:
+            highest_score = this_windows_score
+            best_time_id = i
+    return best_time_id
 
 
-def score_forecast(hour_forecast):
-    temp_score = _temp_c_to_score(hour_forecast["feels_like"])
-    wind_score = _wind_speed_to_score(hour_forecast["wind_speed"])
-    precipitation_score = PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))]
-    return temp_score, wind_score, precipitation_score
+def score_forecast(hour_forecast, what_to_score):
+    all_scores = []
+    if "temperature" in what_to_score:
+        all_scores.append(_temp_c_to_score(hour_forecast["feels_like"]))
+    if "wind" in what_to_score:
+        all_scores.append(_wind_speed_to_score(hour_forecast["wind_speed"]))
+    if "precipitation" in what_to_score:
+        all_scores.append(PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))])
+    return all_scores
 
 
 def _wind_speed_to_score(wind_speed):
@@ -100,6 +124,8 @@ TIME_WINDOWS = {
     "midday": [time(hour=12), time(hour=14)],
     "evening": [time(hour=17), time(hour=21)]
 }
+
+WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]
 
 # My judgement on the best weather conditions to run in (9-best, 0-worst)
 PRECIPITATION_SCORES = {
