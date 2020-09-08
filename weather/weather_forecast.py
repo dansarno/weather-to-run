@@ -2,6 +2,7 @@ import os
 import credentials as cred
 import requests
 from datetime import datetime, time
+import numpy as np
 import json
 
 
@@ -46,16 +47,17 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     for hour_forecast in hourly_forecast:
         this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
         is_next_day = datetime.now().day + 1 == this_datetime.day
-        if is_next_day:
-            is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
-            is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
-            is_in_afternoon = time_windows["evening"][0].hour <= this_datetime.hour <= time_windows["evening"][1].hour
-            if is_in_morning:
-                morning_forecast.append(hour_forecast)
-            if is_in_midday:
-                midday_forecast.append(hour_forecast)
-            if is_in_afternoon:
-                evening_forecast.append(hour_forecast)
+        if not is_next_day:
+            continue
+        is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
+        is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
+        is_in_afternoon = time_windows["evening"][0].hour <= this_datetime.hour <= time_windows["evening"][1].hour
+        if is_in_morning:
+            morning_forecast.append(hour_forecast)
+        if is_in_midday:
+            midday_forecast.append(hour_forecast)
+        if is_in_afternoon:
+            evening_forecast.append(hour_forecast)
 
     # TODO datetime.now() may be problematic for the deployed app
     next_day_forecast = [day_forecast for day_forecast in daily_forecast
@@ -64,20 +66,30 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     return morning_forecast, midday_forecast, evening_forecast, next_day_forecast
 
 
+def aggregate_scores(hourly_forecast):
+    all_scores = [score_forecast(hour_forecast) for hour_forecast in hourly_forecast]
+    lowest_score_and_type = [(min(score), score.index(min(score))) for score in all_scores]
+    return lowest_score_and_type
+
+
+def when_to_run():
+    pass
+
+
 def score_forecast(hour_forecast):
-    temp_score = temp_c_to_score(hour_forecast["feels_like"])
-    wind_score = wind_speed_to_score(hour_forecast["wind_speed"])
+    temp_score = _temp_c_to_score(hour_forecast["feels_like"])
+    wind_score = _wind_speed_to_score(hour_forecast["wind_speed"])
     precipitation_score = PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))]
     return temp_score, wind_score, precipitation_score
 
 
-def wind_speed_to_score(wind_speed):
+def _wind_speed_to_score(wind_speed):
     # Empirical score (9-best, 0-worst) based off the Beaufort scale
     score = 10 - ((wind_speed ** (7 / 6)) / 6)
     return round(min(max(score, 0), 9), 2)
 
 
-def temp_c_to_score(temp_c):
+def _temp_c_to_score(temp_c):
     # Empirical score (9-best, 0-worst)
     score = (-0.023 * (temp_c - 20) ** 2) + 9
     return round(min(max(score, 0), 9), 2)
