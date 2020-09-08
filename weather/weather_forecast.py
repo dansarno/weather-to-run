@@ -109,7 +109,7 @@ TIME_WINDOWS = {
     "morning": [time(hour=6), time(hour=9)],
     "midday": [time(hour=12), time(hour=14)],
     "evening": [time(hour=17), time(hour=21)]
-}
+}  # note: dictionary order is preserved in python 3.7+
 
 WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]
 
