@@ -87,7 +87,7 @@ TIME_WINDOWS = {
 }
 
 # My judgement on the best weather conditions to run in (9-best, 0-worst)
-CONDITIONS_SCORES = {
+PRECIPITATION_SCORES = {
     # Storms  # Snow    # Rain    # Drizzle # Atmos   # Clouds  # Clear
     "200": 1, "600": 4, "500": 5, "300": 5, "701": 7, "801": 9, "800": 9,
     "201": 1, "601": 3, "501": 4, "301": 5, "711": 3, "802": 8,
@@ -103,8 +103,7 @@ CONDITIONS_SCORES = {
 }
 
 # List of weather properties to aggregate
-# Temperature - scored
-# Humidity - doesnt change much in a day so not sure it needs to be here?
+# Temperature - scored (note need to use "feels-like temperature as this accounts for wind chill and humidity)
 # Wind Speed - empirical equation
 # Weather Condition - scored
 
