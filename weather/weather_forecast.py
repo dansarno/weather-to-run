@@ -6,8 +6,8 @@ import numpy as np
 import json
 
 
-def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
-    if not isLocal:
+def fetch_forecast(is_local, location=(51.5074, 0.1278)):
+    if not is_local:
         api_key = os.getenv("API_KEY")
     else:
         api_key = cred.API_KEY
@@ -16,7 +16,7 @@ def fetch_forecast(isLocal, location=(51.5074, 0.1278)):
     url = (f"https://api.openweathermap.org/data/2.5/onecall?"
            f"lat={lat}&lon={lon}"
            f"&exclude=current"
-           f"&&units=metric"
+           f"&units=metric"
            f"&appid={api_key}")
 
     response = requests.get(url)
@@ -82,20 +82,6 @@ def score_window_and_why(lowest_scores_and_reasons, weather_parameters):
     return lowest_score, worst_parameter
 
 
-def when_to_run():
-    hourly_forecast, daily_forecast = fetch_forecast(True)
-    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, TIME_WINDOWS)
-    highest_score = -1
-    best_time_id = 2  # evening by default, likely need changing
-    for i, forecast in enumerate(windowed_forecasts):
-        this_windows_score = score_window_and_why(aggregate_scores(forecast, WEATHER_PARAMETERS), WEATHER_PARAMETERS)[0]
-        is_a_better_time = highest_score < this_windows_score
-        if is_a_better_time:
-            highest_score = this_windows_score
-            best_time_id = i
-    return best_time_id
-
-
 def score_forecast(hour_forecast, what_to_score):
     all_scores = []
     if "temperature" in what_to_score:
@@ -148,4 +134,16 @@ PRECIPITATION_SCORES = {
 # Wind Speed - empirical equation
 # Weather Condition - scored
 
-hours, days = fetch_forecast(True)
+
+def when_to_run(is_local):
+    hourly_forecast, daily_forecast = fetch_forecast(is_local)
+    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, TIME_WINDOWS)
+    highest_score = -1
+    best_time_id = 2  # evening by default, likely need changing
+    for i, forecast in enumerate(windowed_forecasts):
+        this_windows_score = score_window_and_why(aggregate_scores(forecast, WEATHER_PARAMETERS), WEATHER_PARAMETERS)[0]
+        is_a_better_time = highest_score < this_windows_score
+        if is_a_better_time:
+            highest_score = this_windows_score
+            best_time_id = i
+    return best_time_id
