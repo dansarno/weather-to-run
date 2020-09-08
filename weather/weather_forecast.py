@@ -68,7 +68,17 @@ def aggregate_forecast(hourly_forecast):
     pass
 
 
-hours, days = fetch_forecast(True)
+def wind_speed_to_score(wind_speed):
+    # Empirical score (9-best, 0-worst) based off the Beaufort scale
+    score = 9 - ((wind_speed ** (7 / 6)) / 6)
+    return round(max(score, 0), 2)
+
+
+def temp_c_to_score(temp_c):
+    # Empirical score (9-best, 0-worst)
+    score = ((-0.023) * (temp_c - 20) ** 2) + 8.7
+    return round(min(max(score, 0), 9), 2)
+
 
 TIME_WINDOWS = {
     "morning": [time(hour=6), time(hour=9)],
@@ -76,26 +86,26 @@ TIME_WINDOWS = {
     "evening": [time(hour=17), time(hour=21)]
 }
 
-# My judgement on the best temperatures to run in
-TEMP_C_SCORES = {
-    -1: 2, -2: 2, -3: 1, -4: 1, -5: 1, -6: 1, -7: 1, -8: 1, -9: 1,
-    0:  3,  1: 3,  2: 4,  3: 4,  4: 4,  5: 5,  6: 5,  7: 5,  8: 5,  9: 5,
-    10: 6, 11: 6, 12: 6, 13: 7, 14: 7, 15: 8, 16: 8, 17: 8, 18: 9, 19: 9,
-    20: 9, 21: 9, 22: 9, 23: 8, 24: 8, 25: 8, 26: 7, 27: 7, 28: 7, 29: 6,
-    30: 6, 31: 5, 32: 4, 33: 3, 34: 2, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1
+# My judgement on the best weather conditions to run in (9-best, 0-worst)
+CONDITIONS_SCORES = {
+    # Storms  # Snow    # Rain    # Drizzle # Atmos   # Clouds  # Clear
+    "200": 1, "600": 4, "500": 5, "300": 5, "701": 7, "801": 9, "800": 9,
+    "201": 1, "601": 3, "501": 4, "301": 5, "711": 3, "802": 8,
+    "202": 0, "602": 1, "502": 3, "302": 2, "721": 6, "803": 8,
+    "210": 1, "611": 3, "503": 1, "310": 4, "731": 3, "804": 8,
+    "211": 1, "612": 4, "504": 0, "311": 3, "741": 7,
+    "212": 0, "613": 4, "511": 0, "312": 2, "751": 3,
+    "221": 1, "615": 3, "520": 4, "313": 3, "761": 3,
+    "230": 1, "616": 2, "521": 3, "314": 2, "762": 0,
+    "231": 1, "620": 3, "522": 1, "321": 3, "771": 1,
+    "232": 0, "621": 2, "531": 1, "781": 0,
+              "622": 1
 }
 
-CONDITIONS_SCORES = {
-    # Storms    # Snow    # Rain      # Drizzle     # Atmos     # Clouds    # Clear
-    "200": 2,   "600": 4,   "500": 5,   "300": 5,   "701": 7,   "801": 9,   "800": 9,
-    "201": 2,   "601": 3,   "501": 4,   "301": 5,   "711": 3,   "802": 8,
-    "202": 1,   "602": 1,   "502": 3,   "302": 2,   "721": 6,   "803": 8,
-    "210": 1,   "611": 3,   "503": 2,   "310": 4,   "731": 3,   "804": 8,
-    "211": 1,   "612": 4,   "504": 1,   "311": 3,   "741": 7,
-    "212": 1,   "613": 4,   "511": 1,   "312": 2,   "751": 3,
-    "221": 1,   "615": 3,   "520": 4,   "313": 3,   "761": 3,
-    "230": 1,   "616": 2,   "521": 3,   "314": 2,   "762": 1,
-    "231": 1,   "620": 3,   "522": 1,   "321": 3,   "771": 1,
-    "232": 1,   "621": 2,   "531": 1,               "781": 1,
-                "622": 1
-}
+# List of weather properties to aggregate
+# Temperature - scored
+# Humidity - doesnt change much in a day so not sure it needs to be here?
+# Wind Speed - empirical equation
+# Weather Condition - scored
+
+hours, days = fetch_forecast(True)
