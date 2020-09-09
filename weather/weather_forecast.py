@@ -147,8 +147,10 @@ def when_to_run(time_windows, is_local=True):
     hourly_forecast, daily_forecast = fetch_forecast(is_local)
     # This is a debug test
     all_scores = [score_forecast(hour_forecast, WEATHER_PARAMETERS) for hour_forecast in hourly_forecast]
+    time = [datetime.fromtimestamp(hour["dt"]).strftime("%d, %H:%M") for hour in hourly_forecast]
     plt.figure()
-    plt.plot(all_scores)
+    plt.plot(time, all_scores)
+    plt.xticks(rotation=70)
     plt.show()
     # Test over
     windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
