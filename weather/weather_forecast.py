@@ -126,7 +126,7 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
     for window_name, window_times in time_windows.items():
         rect_width = max(window_times).hour - min(window_times).hour
         x = min(window_times).hour + (24 - datetime.now().hour)
-        rect = patches.Rectangle((x, 0), rect_width, 9, edgecolor='none', facecolor='pink', alpha=90)
+        rect = patches.Rectangle((x, 0), rect_width, 9, edgecolor='none', facecolor='gray', alpha=95)
         ax.add_patch(rect)
 
     ax.plot(forecast_times, all_scores)
@@ -135,7 +135,9 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
     ax.xaxis.set_tick_params(rotation=30)
     ax.xaxis.set_major_locator(MultipleLocator(5))
     ax.yaxis.set_major_locator(MultipleLocator(1))
-    ax.set_ylim([0, 9])
+    ax.set_ylim([0, 9.5])
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     plt.show()
 
 

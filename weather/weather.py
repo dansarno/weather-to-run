@@ -1,4 +1,5 @@
 import weather_config
+import datetime
 
 
 class TimePeriod:
@@ -14,11 +15,17 @@ class TimePeriod:
 
 
 class WholeDay(TimePeriod):
-    def __init__(self, date):
+    def __init__(self, date=datetime.datetime.now().date()):
         super().__init__()
-        self.date = date
         self.sunrise = 0
         self.sunset = 0
+        self.best_running = ""  # TODO this needs to be configured correctly
+
+        if date:
+            self.date = date
+        else:
+            # Set date to tomorrow
+            self.date = (datetime.datetime.now() + datetime.timedelta(days=1)).date()
 
 
 class DaySegment(TimePeriod):
