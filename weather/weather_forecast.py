@@ -2,7 +2,7 @@ import os
 import credentials as cred
 import requests
 from datetime import datetime, time
-import numpy as np
+import matplotlib.pyplot as plt
 import json
 
 
@@ -41,29 +41,37 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     :rtype: List of dictionaries
     """
 
-    morning_forecast = []
-    midday_forecast = []
-    evening_forecast = []
+    # morning_forecast = []
+    # midday_forecast = []
+    # evening_forecast = []
+    windowed_forecasts = {window_name: [] for window_name in time_windows.keys()}
     for hour_forecast in hourly_forecast:
         this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
         is_next_day = datetime.now().day + 1 == this_datetime.day
         if not is_next_day:
             continue
-        is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
-        is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
-        is_in_afternoon = time_windows["evening"][0].hour <= this_datetime.hour <= time_windows["evening"][1].hour
-        if is_in_morning:
-            morning_forecast.append(hour_forecast)
-        if is_in_midday:
-            midday_forecast.append(hour_forecast)
-        if is_in_afternoon:
-            evening_forecast.append(hour_forecast)
+
+        # Check if this hour is within any of the time windows
+        for window_name, window_times in time_windows.items():
+            is_in_window = window_times[0].hour <= this_datetime.hour <= window_times[1].hour
+            if is_in_window:
+                windowed_forecasts[window_name].append(hour_forecast)
+
+        # is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
+        # is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
+        # is_in_afternoon = time_windows["evening"][0].hour <= this_datetime.hour <= time_windows["evening"][1].hour
+        # if is_in_morning:
+        #     morning_forecast.append(hour_forecast)
+        # if is_in_midday:
+        #     midday_forecast.append(hour_forecast)
+        # if is_in_afternoon:
+        #     evening_forecast.append(hour_forecast)
 
     # TODO datetime.now() may be problematic for the deployed app
     tomorrows_summary = [day_forecast for day_forecast in daily_forecast
                          if datetime.fromtimestamp(day_forecast["dt"]).day == datetime.now().day + 1][0]
 
-    return [morning_forecast, midday_forecast, evening_forecast], tomorrows_summary
+    return windowed_forecasts, tomorrows_summary
 
 
 def aggregate_scores(hourly_forecast, what_to_score):
@@ -135,15 +143,25 @@ PRECIPITATION_SCORES = {
 # Weather Condition - scored
 
 
-def when_to_run(is_local):
+def when_to_run(time_windows, is_local=True):
     hourly_forecast, daily_forecast = fetch_forecast(is_local)
-    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, TIME_WINDOWS)
+    # This is a debug test
+    all_scores = [score_forecast(hour_forecast, WEATHER_PARAMETERS) for hour_forecast in hourly_forecast]
+    plt.figure()
+    plt.plot(all_scores)
+    plt.show()
+    # Test over
+    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
     highest_score = -1
-    best_time_id = 2  # evening by default, likely need changing
-    for i, forecast in enumerate(windowed_forecasts):
+    best_time = ""  # likely need changing
+    for window_name, forecast in windowed_forecasts.items():
         this_windows_score = score_window_and_why(aggregate_scores(forecast, WEATHER_PARAMETERS), WEATHER_PARAMETERS)[0]
         is_a_better_time = highest_score < this_windows_score
         if is_a_better_time:
             highest_score = this_windows_score
-            best_time_id = i
-    return best_time_id
+            best_time = window_name
+    return best_time
+
+
+outcome = when_to_run(TIME_WINDOWS)
+print(outcome.title())
