@@ -1,4 +1,4 @@
-from datetime import date, time, datetime
+import datetime
 
 
 class TimePeriod:
@@ -27,8 +27,25 @@ class DaySegment(TimePeriod):
         self.name = name
         self.start_time = start_time
         self.end_time = end_time
+        self.duration = abs(end_time.hour - start_time.hour)
 
 
 class Hour(TimePeriod):
-    def __init__(self):
+    def __init__(self, hr):
         super().__init__()
+        self.hr = hr
+
+
+TIME_WINDOWS = {
+    "morning": [datetime.time(hour=6), datetime.time(hour=9)],
+    "midday": [datetime.time(hour=12), datetime.time(hour=14)],
+    "evening": [datetime.time(hour=17), datetime.time(hour=21)]
+}
+
+
+morning = DaySegment("morning", datetime.time(), datetime.time())
+
+segments = []
+for window_name, window_times in TIME_WINDOWS.items():
+    start, end = window_times
+    segments.append(DaySegment(window_name, start, end))
