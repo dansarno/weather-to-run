@@ -3,6 +3,7 @@ import credentials as cred
 import requests
 from datetime import datetime, time
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import json
 
 
@@ -113,6 +114,24 @@ def _temp_c_to_score(temp_c):
     return round(min(max(score, 0), 9), 2)
 
 
+def _plot_scores(hourly_forecast, what_to_score, time_windows):
+    all_scores = [score_forecast(hour_forecast, what_to_score) for hour_forecast in hourly_forecast]
+    forecast_times = [datetime.fromtimestamp(hour["dt"]).strftime("%d, %H:%M") for hour in hourly_forecast]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for window_name, window_times in time_windows.items():
+        rect_width = max(window_times).hour - min(window_times).hour
+        x = min(window_times).hour + (24 - datetime.now().hour)
+        rect = patches.Rectangle((x, 0), rect_width, 9, edgecolor='none', facecolor='pink', alpha=90)
+        ax.add_patch(rect)
+
+    ax.plot(forecast_times, all_scores)
+    ax.xaxis.set_tick_params(rotation=90)
+    plt.show()
+
+
 TIME_WINDOWS = {
     "morning": [time(hour=6), time(hour=9)],
     "midday": [time(hour=12), time(hour=14)],
@@ -143,16 +162,10 @@ PRECIPITATION_SCORES = {
 # Weather Condition - scored
 
 
-def when_to_run(time_windows, is_local=True):
+def when_to_run(time_windows, is_local=True, is_debug=True):
     hourly_forecast, daily_forecast = fetch_forecast(is_local)
-    # This is a debug test
-    all_scores = [score_forecast(hour_forecast, WEATHER_PARAMETERS) for hour_forecast in hourly_forecast]
-    forecast_times = [datetime.fromtimestamp(hour["dt"]).strftime("%d, %H:%M") for hour in hourly_forecast]
-    plt.figure()
-    plt.plot(forecast_times, all_scores)
-    plt.xticks(rotation=70)
-    plt.show()
-    # Test over
+    if is_debug:
+        _plot_scores(hourly_forecast, WEATHER_PARAMETERS, time_windows)
     windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
     highest_score = -1
     best_time = ""  # likely need changing
