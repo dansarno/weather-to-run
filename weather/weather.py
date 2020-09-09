@@ -1,4 +1,4 @@
-import datetime
+import weather_config
 
 
 class TimePeriod:
@@ -29,6 +29,12 @@ class DaySegment(TimePeriod):
         self.end_time = end_time
         self.duration = abs(end_time.hour - start_time.hour)
 
+    def __str__(self):
+        return f"DaySegment object called {self.name.title()} ({self.start_time} to {self.end_time})"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name.title()},({self.start_time} - {self.end_time}))"
+
 
 class Hour(TimePeriod):
     def __init__(self, hr):
@@ -36,16 +42,7 @@ class Hour(TimePeriod):
         self.hr = hr
 
 
-TIME_WINDOWS = {
-    "morning": [datetime.time(hour=6), datetime.time(hour=9)],
-    "midday": [datetime.time(hour=12), datetime.time(hour=14)],
-    "evening": [datetime.time(hour=17), datetime.time(hour=21)]
-}
-
-
-morning = DaySegment("morning", datetime.time(), datetime.time())
-
 segments = []
-for window_name, window_times in TIME_WINDOWS.items():
+for window_name, window_times in weather_config.TIME_WINDOWS.items():
     start, end = window_times
     segments.append(DaySegment(window_name, start, end))

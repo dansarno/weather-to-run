@@ -1,9 +1,11 @@
+import weather_config
 import os
 import credentials as cred
 import requests
 from datetime import datetime, time
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.ticker import MultipleLocator
 import json
 
 
@@ -98,7 +100,7 @@ def score_forecast(hour_forecast, what_to_score):
     if "wind" in what_to_score:
         all_scores.append(_wind_speed_to_score(hour_forecast["wind_speed"]))
     if "precipitation" in what_to_score:
-        all_scores.append(PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))])
+        all_scores.append(weather_config.PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))])
     return all_scores
 
 
@@ -128,49 +130,25 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
         ax.add_patch(rect)
 
     ax.plot(forecast_times, all_scores)
-    ax.xaxis.set_tick_params(rotation=90)
+    ax.set_xlabel("Datetime")
+    ax.set_ylabel("Score")
+    ax.xaxis.set_tick_params(rotation=30)
+    ax.xaxis.set_major_locator(MultipleLocator(5))
+    ax.yaxis.set_major_locator(MultipleLocator(1))
+    ax.set_ylim([0, 9])
     plt.show()
-
-
-TIME_WINDOWS = {
-    "morning": [time(hour=6), time(hour=9)],
-    "midday": [time(hour=12), time(hour=14)],
-    "evening": [time(hour=17), time(hour=21)]
-}
-
-WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]
-
-# My judgement on the best weather conditions to run in (9-best, 0-worst)
-PRECIPITATION_SCORES = {
-    # Storms  # Snow    # Rain    # Drizzle # Atmos   # Clouds  # Clear
-    "200": 1, "600": 4, "500": 5, "300": 5, "701": 7, "801": 9, "800": 9,
-    "201": 1, "601": 3, "501": 4, "301": 5, "711": 3, "802": 8,
-    "202": 0, "602": 1, "502": 3, "302": 2, "721": 6, "803": 8,
-    "210": 1, "611": 3, "503": 1, "310": 4, "731": 3, "804": 8,
-    "211": 1, "612": 4, "504": 0, "311": 3, "741": 7,
-    "212": 0, "613": 4, "511": 0, "312": 2, "751": 3,
-    "221": 1, "615": 3, "520": 4, "313": 3, "761": 3,
-    "230": 1, "616": 2, "521": 3, "314": 2, "762": 0,
-    "231": 1, "620": 3, "522": 1, "321": 3, "771": 1,
-    "232": 0, "621": 2, "531": 1, "781": 0,
-              "622": 1
-}
-
-# List of weather properties to aggregate
-# Temperature - scored (note need to use "feels-like temperature as this accounts for wind chill and humidity)
-# Wind Speed - empirical equation
-# Weather Condition - scored
 
 
 def when_to_run(time_windows, is_local=True, is_debug=True):
     hourly_forecast, daily_forecast = fetch_forecast(is_local)
     if is_debug:
-        _plot_scores(hourly_forecast, WEATHER_PARAMETERS, time_windows)
+        _plot_scores(hourly_forecast, weather_config.WEATHER_PARAMETERS, time_windows)
     windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
     highest_score = -1
     best_time = ""  # likely need changing
     for window_name, forecast in windowed_forecasts.items():
-        this_windows_score = score_window_and_why(aggregate_scores(forecast, WEATHER_PARAMETERS), WEATHER_PARAMETERS)[0]
+        this_windows_score = score_window_and_why(
+            aggregate_scores(forecast, weather_config.WEATHER_PARAMETERS), weather_config.WEATHER_PARAMETERS)[0]
         is_a_better_time = highest_score < this_windows_score
         if is_a_better_time:
             highest_score = this_windows_score
@@ -178,5 +156,5 @@ def when_to_run(time_windows, is_local=True, is_debug=True):
     return best_time
 
 
-outcome = when_to_run(TIME_WINDOWS)
+outcome = when_to_run(weather_config.TIME_WINDOWS)
 print(outcome.title())
