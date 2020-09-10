@@ -14,18 +14,22 @@ class TimePeriod:
         self.weather_icon = ""
 
 
-class WholeDay(TimePeriod):
-    def __init__(self, date=datetime.datetime.now().date()):
+class Day(TimePeriod):
+    def __init__(self, date=datetime.date.today() + datetime.timedelta(days=1), segments=weather_config.TIME_WINDOWS):
         super().__init__()
         self.sunrise = 0
         self.sunset = 0
-        self.best_running = ""  # TODO this needs to be configured correctly
+        self.date = date
+        self.segments = [DaySegment(name, times[0], times[1]) for name, times in segments.items()]
+        self.best_segments = {"Green": [], "Amber": [], "Red": []}
 
-        if date:
-            self.date = date
-        else:
-            # Set date to tomorrow
-            self.date = (datetime.datetime.now() + datetime.timedelta(days=1)).date()
+    def __str__(self):
+        return f"Day with date {self.date.strftime('%d/%m/%y')} and {len(self.segments)} segments: " \
+               f"{', '.join([segment.name.title() for segment in self.segments])}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.date.strftime('%d/%m/%y')}, " \
+               f"({', '.join([segment.name.title() for segment in self.segments])}))"
 
 
 class DaySegment(TimePeriod):
@@ -40,7 +44,7 @@ class DaySegment(TimePeriod):
         return f"DaySegment object called {self.name.title()} ({self.start_time} to {self.end_time})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name.title()},({self.start_time} - {self.end_time}))"
+        return f"{self.__class__.__name__}({self.name.title()} ({self.start_time} - {self.end_time}))"
 
 
 class Hour(TimePeriod):
@@ -48,8 +52,3 @@ class Hour(TimePeriod):
         super().__init__()
         self.hr = hr
 
-
-segments = []
-for window_name, window_times in weather_config.TIME_WINDOWS.items():
-    start, end = window_times
-    segments.append(DaySegment(window_name, start, end))
