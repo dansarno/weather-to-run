@@ -101,8 +101,28 @@ class Day(TimePeriod):
             worst_score = segment.judge_score()
             seg_and_worst_score.append([segment, worst_score])
 
+        self._rank_segments(seg_and_worst_score)
+
+        self.average_score()
+        self.judge_score()
+
+    def weather_at_time(self, time):
+        pass
+
+    def _filter_forecast(self):
+        for hour in self.hours:
+            # Check if this hour is within any of the time segments
+            for segment in self.segments:
+                is_in_window = segment.start_time.hour <= hour.hr <= segment.end_time.hour
+                if is_in_window:
+                    segment.hours.append(hour)
+
+        # Update segment attributes after segments have hours
+        for segment in self.segments:
+            segment.average_weather()
+
+    def _rank_segments(self, seg_and_worst_score):
         ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
-        print(ordered_seg_and_worst_score)
         prev_worst = 0
         for segment, worst_score in ordered_seg_and_worst_score:
             for name, segment_list in self.rankings.items():
@@ -117,24 +137,6 @@ class Day(TimePeriod):
                     else:
                         segment_list[-1] = [segment_list[-1], segment]
             prev_worst = worst_score
-
-        self.average_score()
-        self.judge_score()
-
-    def _filter_forecast(self):
-        for hour in self.hours:
-            # Check if this hour is within any of the time segments
-            for segment in self.segments:
-                is_in_window = segment.start_time.hour <= hour.hr <= segment.end_time.hour
-                if is_in_window:
-                    segment.hours.append(hour)
-
-        # Update segment attributes after segments have hours
-        for segment in self.segments:
-            segment.average_weather()
-
-    def weather_at_time(self, time):
-        pass
 
 
 class DaySegment(TimePeriod):
