@@ -8,6 +8,12 @@ TIME_WINDOWS = {
 
 WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]
 
+# ie equally weighted - CURRENTLY NOT USED!!!!
+WEATHER_WEIGHTINGS = {"temperature": 0.33,
+                      "wind": 0.33,
+                      "precipitation": 0.33
+                      }
+
 LOCATION = {"London": (51.5074, 0.1278)}  # Needs to be generalised in the future
 
 # My judgement on the best weather conditions to run in (9-best, 0-worst)
@@ -24,4 +30,10 @@ PRECIPITATION_SCORES = {
     "231": 1, "620": 3, "522": 1, "321": 3, "771": 1,
     "232": 0, "621": 2, "531": 1, "781": 0,
               "622": 1
+}
+
+ALERT_BANDS = {
+    "Green": [6.5, 9.0],
+    "Amber": [3.0, 6.4],
+    "Red": [0.0, 2.9]
 }

@@ -7,14 +7,40 @@ TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
 is_Local = True
 
 
-class TimePeriod:
+class DT:
     def __init__(self):
         self.temp_c = 0
         self.temp_score = 0
         self.wind_mps = 0
         self.wind_score = 0
-        self.precipitation_type = 0
+        self.precipitation_type = ""
         self.precipitation_score = 0
+
+
+class TimePeriod(DT):
+    def __init__(self):
+        super().__init__()
+        self.hours = []
+        self.alert_level = ""
+
+    def average_score(self):
+        if self.hours:
+            all_temp_scores = [hour.temp_score for hour in self.hours]
+            all_wind_scores = [hour.wind_score for hour in self.hours]
+            all_precip_scores = [hour.precipitation_score for hour in self.hours]
+
+            self.temp_score = round(sum(all_temp_scores) / len(all_temp_scores), 2)
+            self.wind_score = round(sum(all_wind_scores) / len(all_wind_scores), 2)
+            self.precipitation_score = all_precip_scores[len(all_precip_scores) // 2]  # this may need changing!
+
+    def judge_score(self, bands=config.ALERT_BANDS):
+        worst_alert_level = ""
+        worst_score = min([self.temp_score, self.wind_score, self.precipitation_score])
+        for alert_name, band_limits in bands.items():
+            if band_limits[0] <= round(worst_score, 1) <= band_limits[1]:
+                worst_alert_level = alert_name
+        self.alert_level = worst_alert_level
+        return worst_score
 
 
 class Day(TimePeriod):
@@ -24,7 +50,6 @@ class Day(TimePeriod):
         self.sunset = 0
         self.date = date
         self.location = config.LOCATION
-        self.hours = []
         self.segments = [DaySegment(name, times[0], times[1]) for name, times in segments.items()]
         self.rankings = {"Green": [], "Amber": [], "Red": []}
 
@@ -70,8 +95,31 @@ class Day(TimePeriod):
             hour.wind_score = fcast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
+        seg_and_worst_score = []
         for segment in self.segments:
             segment.average_score()
+            worst_score = segment.judge_score()
+            seg_and_worst_score.append([segment, worst_score])
+
+        ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
+        print(ordered_seg_and_worst_score)
+        prev_worst = 0
+        for segment, worst_score in ordered_seg_and_worst_score:
+            for name, segment_list in self.rankings.items():
+                if not segment.alert_level.lower() == name.lower():
+                    continue
+                if prev_worst != worst_score:
+                    segment_list.append(segment)
+                else:
+                    prev_el = segment_list[-1]
+                    if isinstance(prev_el, list):
+                        segment_list[-1] = segment_list[-1].append(segment)
+                    else:
+                        segment_list[-1] = [segment_list[-1], segment]
+            prev_worst = worst_score
+
+        self.average_score()
+        self.judge_score()
 
     def _filter_forecast(self):
         for hour in self.hours:
@@ -96,7 +144,6 @@ class DaySegment(TimePeriod):
         self.start_time = start_time
         self.end_time = end_time
         self.duration = abs(end_time.hour - start_time.hour)
-        self.hours = []
 
     def __str__(self):
         return f"DaySegment object called {self.name.title()} ({self.start_time} to {self.end_time})"
@@ -113,17 +160,8 @@ class DaySegment(TimePeriod):
         self.wind_mps = round(sum(all_wind_mps) / len(all_wind_mps), 2)
         self.precipitation_type = all_precip_types[len(all_precip_types) // 2]  # this may need changing!
 
-    def average_score(self):
-        all_temp_scores = [hour.temp_score for hour in self.hours]
-        all_wind_scores = [hour.wind_score for hour in self.hours]
-        all_precip_scores = [hour.precipitation_score for hour in self.hours]
 
-        self.temp_score = round(sum(all_temp_scores) / len(all_temp_scores), 2)
-        self.wind_score = round(sum(all_wind_scores) / len(all_wind_scores), 2)
-        self.precipitation_score = all_precip_scores[len(all_precip_scores) // 2]  # this may need changing!
-
-
-class Hour(TimePeriod):
+class Hour(DT):
     def __init__(self, hr):
         super().__init__()
         self.hr = hr
