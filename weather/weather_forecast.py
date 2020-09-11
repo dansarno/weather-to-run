@@ -44,9 +44,6 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     :rtype: List of dictionaries
     """
 
-    # morning_forecast = []
-    # midday_forecast = []
-    # evening_forecast = []
     windowed_forecasts = {window_name: [] for window_name in time_windows.keys()}
     for hour_forecast in hourly_forecast:
         this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
@@ -59,16 +56,6 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
             is_in_window = window_times[0].hour <= this_datetime.hour <= window_times[1].hour
             if is_in_window:
                 windowed_forecasts[window_name].append(hour_forecast)
-
-        # is_in_morning = time_windows["morning"][0].hour <= this_datetime.hour <= time_windows["morning"][1].hour
-        # is_in_midday = time_windows["midday"][0].hour <= this_datetime.hour <= time_windows["midday"][1].hour
-        # is_in_afternoon = time_windows["evening"][0].hour <= this_datetime.hour <= time_windows["evening"][1].hour
-        # if is_in_morning:
-        #     morning_forecast.append(hour_forecast)
-        # if is_in_midday:
-        #     midday_forecast.append(hour_forecast)
-        # if is_in_afternoon:
-        #     evening_forecast.append(hour_forecast)
 
     # TODO datetime.now() may be problematic for the deployed app
     tomorrows_summary = [day_forecast for day_forecast in daily_forecast
@@ -96,21 +83,21 @@ def score_window_and_why(lowest_scores_and_reasons, weather_parameters):
 def score_forecast(hour_forecast, what_to_score):
     all_scores = []
     if "temperature" in what_to_score:
-        all_scores.append(_temp_c_to_score(hour_forecast["feels_like"]))
+        all_scores.append(temp_c_to_score(hour_forecast["feels_like"]))
     if "wind" in what_to_score:
-        all_scores.append(_wind_speed_to_score(hour_forecast["wind_speed"]))
+        all_scores.append(wind_speed_to_score(hour_forecast["wind_speed"]))
     if "precipitation" in what_to_score:
         all_scores.append(weather_config.PRECIPITATION_SCORES[str(int(hour_forecast["weather"][0]["id"]))])
     return all_scores
 
 
-def _wind_speed_to_score(wind_speed):
+def wind_speed_to_score(wind_speed):
     # Empirical score (9-best, 0-worst) based off the Beaufort scale
     score = 10 - ((wind_speed ** (7 / 6)) / 6)
     return round(min(max(score, 0), 9), 2)
 
 
-def _temp_c_to_score(temp_c):
+def temp_c_to_score(temp_c):
     # Empirical score (9-best, 0-worst)
     score = (-0.023 * (temp_c - 20) ** 2) + 9
     return round(min(max(score, 0), 9), 2)
@@ -158,5 +145,6 @@ def when_to_run(time_windows, is_local=True, is_debug=True):
     return best_time
 
 
-outcome = when_to_run(weather_config.TIME_WINDOWS)
-print(outcome.title())
+if __name__ == "__main__":
+    outcome = when_to_run(weather_config.TIME_WINDOWS)
+    print(outcome.title())

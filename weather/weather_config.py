@@ -8,6 +8,8 @@ TIME_WINDOWS = {
 
 WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]
 
+LOCATION = {"London": (51.5074, 0.1278)}  # Needs to be generalised in the future
+
 # My judgement on the best weather conditions to run in (9-best, 0-worst)
 PRECIPITATION_SCORES = {
     # Storms  # Snow    # Rain    # Drizzle # Atmos   # Clouds  # Clear
