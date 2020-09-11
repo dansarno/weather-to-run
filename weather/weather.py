@@ -95,16 +95,38 @@ class Day(TimePeriod):
             hour.wind_score = fcast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
-        seg_and_worst_score = []
         for segment in self.segments:
             segment.average_score()
-            worst_score = segment.judge_score()
-            seg_and_worst_score.append([segment, worst_score])
-
-        self._rank_segments(seg_and_worst_score)
 
         self.average_score()
         self.judge_score()
+
+    def rank_segments(self, segments_to_rank=None):
+        # By default use all segments in the day if not specified otherwise
+        if not segments_to_rank:
+            segments_to_rank = self.segments
+
+        seg_and_worst_score = []
+        for segment in segments_to_rank:
+            worst_score = segment.judge_score()
+            seg_and_worst_score.append([segment, worst_score])
+        ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
+
+        self.rankings = {"Green": [], "Amber": [], "Red": []}  # reset rankings
+        prev_worst = 0
+        for segment, worst_score in ordered_seg_and_worst_score:
+            for name, segment_list in self.rankings.items():
+                if not segment.alert_level.lower() == name.lower():
+                    continue
+                if prev_worst != worst_score:
+                    segment_list.append(segment)
+                else:
+                    prev_el = segment_list[-1]
+                    if isinstance(prev_el, list):
+                        segment_list[-1] = segment_list[-1].append(segment)
+                    else:
+                        segment_list[-1] = [segment_list[-1], segment]
+            prev_worst = worst_score
 
     def weather_at_time(self, time):
         pass
@@ -120,23 +142,6 @@ class Day(TimePeriod):
         # Update segment attributes after segments have hours
         for segment in self.segments:
             segment.average_weather()
-
-    def _rank_segments(self, seg_and_worst_score):
-        ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
-        prev_worst = 0
-        for segment, worst_score in ordered_seg_and_worst_score:
-            for name, segment_list in self.rankings.items():
-                if not segment.alert_level.lower() == name.lower():
-                    continue
-                if prev_worst != worst_score:
-                    segment_list.append(segment)
-                else:
-                    prev_el = segment_list[-1]
-                    if isinstance(prev_el, list):
-                        segment_list[-1] = segment_list[-1].append(segment)
-                    else:
-                        segment_list[-1] = [segment_list[-1], segment]
-            prev_worst = worst_score
 
 
 class DaySegment(TimePeriod):
