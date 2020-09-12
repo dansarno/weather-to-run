@@ -4,4 +4,4 @@ import config
 api = config.create_api(True)
 
 # Create a test tweet
-api.update_status("The curse of the third tweet!")
+api.update_status("Yet another twitter API test")
