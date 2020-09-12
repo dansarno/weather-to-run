@@ -77,13 +77,43 @@ Intro:
     Deep breaths
 
 
-Weather text:
+Weather text 1:
   - Green:
     Looks like it's best to run ADP NOUN
     NOUN is the best for tomorrow I reckon
+    Wanna run tomorrow? NOUN is looking like the best time to go out
+    Drum roll please.... NOUN, NOUN is the best time to run
+    NOUN looks lovely for a run
+    Looking great ADP NOUN, I'd run then if I were you
+
+  - Amber:
+    Hmmmm, less than ideal but I'd say a NOUN run is best tomorrow
+    Better running weather is ADP NOUN
+    If I had to pick (I know, I know, that's my job) I'd run ADP NOUN
+    Your best option is ADP NOUN
+
+  - Red:
+
+
+
+Weather text 2:
+  - Green:
+    Either ADP NOUN or ADP NOUN works, go for it
+    NOUN or NOUN, take ya pick
+    According to my sources, the weather is looking good for a NOUN or NOUN run
+
+
   - Amber:
 
   - Red:
+
+Weather text 3:
+  - Green:
+
+  - Amber:
+
+  - Red:
+
 
 
 Outro:
@@ -111,7 +141,13 @@ Outro:
     Like and subscribe
     Peace and love
     You heard me, go!
-
+    End of transmission
+    End of message
+    You've been you, I've been me, goodbye
+    Goodbye
+    Byeeee x
+    Easy one that
+    Eeeasy, eeeaasy
 
   - Amber:
     Take it easy
