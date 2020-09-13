@@ -7,7 +7,7 @@ TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
 is_Local = True
 
 
-class DT:
+class TimeElement:
     def __init__(self):
         self.temp_c = 0
         self.temp_score = 0
@@ -17,7 +17,7 @@ class DT:
         self.precipitation_score = 0
 
 
-class TimePeriod(DT):
+class TimePeriod(TimeElement):
     def __init__(self):
         super().__init__()
         self.hours = []
@@ -168,7 +168,7 @@ class DaySegment(TimePeriod):
         self.precipitation_type = all_precip_types[len(all_precip_types) // 2]  # this may need changing!
 
 
-class Hour(DT):
+class Hour(TimeElement):
     def __init__(self, hr):
         super().__init__()
         self.hr = hr

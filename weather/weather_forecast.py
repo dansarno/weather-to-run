@@ -40,7 +40,7 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
     :type daily_forecast: List of dictionaries
     :param time_windows: Start and end times of the running time windows
     :type time_windows: Dictionary
-    :return: Morning, midday, evening and next day forecasts
+    :return: Morning, afternoon, evening and next day forecasts
     :rtype: List of dictionaries
     """
 

@@ -2,7 +2,7 @@ import datetime
 
 TIME_WINDOWS = {
     "morning": [datetime.time(hour=6), datetime.time(hour=9)],
-    "midday": [datetime.time(hour=12), datetime.time(hour=14)],
+    "afternoon": [datetime.time(hour=12), datetime.time(hour=14)],
     "evening": [datetime.time(hour=17), datetime.time(hour=21)]
 }
 
