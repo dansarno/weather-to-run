@@ -20,15 +20,19 @@ def add_selections_to_tweet(tweet_text, selections):
 
 
 def add_selections_to_tweet2(tweet_text, selections):
-    new_text = re.sub("NOUN", selections[0], tweet_text)
-    return new_text
+    text_with_selection = re.sub("NOUN", selections[0], tweet_text)
+    if selections[0] == "afternoon" or selections[0] == "evening":
+        text_with_selection_and_indef = re.sub("A\(N\)", "an", text_with_selection)
+    else:
+        text_with_selection_and_indef = re.sub("A\(N\)", "a", text_with_selection)
+    return text_with_selection_and_indef
 
 
 with open('tweet_content.yaml', 'r', encoding="utf8") as f:
     doc = yaml.load(f)
 
-tone = "Green"
-results = ["morning"]
+tone = "Amber"
+results = ["afternoon"]
 weathers = len(results)
 prob_of_no_intro = 0.3
 prob_of_no_outro = 0.25
