@@ -20,10 +20,10 @@ with open('tweet_content.yaml', 'r', encoding="utf8") as f:
     doc = yaml.load(f)
 
 tone = "Green"
-results = ["afternoon", "morning"]
+results = ["afternoon"]
 weathers = len(results)
-prob_of_no_intro = 0.3
-prob_of_no_outro = 0.25
+prob_of_no_intro = 0.7
+prob_of_no_outro = 0.75
 
 for _ in range(100):
     start = random.choice(doc['Intro'][tone])
@@ -33,10 +33,10 @@ for _ in range(100):
     formed_middle = add_selections_to_tweet(middle, results)
 
     tweet_construction = []
-    if random.random() > prob_of_no_intro:
+    if random.random() < prob_of_no_intro:
         tweet_construction.append(start)
     tweet_construction.append(formed_middle)
-    if random.random() > prob_of_no_outro:
+    if random.random() < prob_of_no_outro:
         tweet_construction.append(end)
 
     tweet = " ".join(tweet_construction)
