@@ -1,6 +1,7 @@
 import yaml
 import numpy as np
 import random
+import re
 
 
 def add_selections_to_tweet(tweet_text, selections):
@@ -18,6 +19,11 @@ def add_selections_to_tweet(tweet_text, selections):
     return formed_tweet
 
 
+def add_selections_to_tweet2(tweet_text, selections):
+    new_text = re.sub("NOUN", selections[0], tweet_text)
+    return new_text
+
+
 with open('tweet_content.yaml', 'r', encoding="utf8") as f:
     doc = yaml.load(f)
 
@@ -32,7 +38,7 @@ for _ in range(100):
     middle = random.choice(doc[f'Weather text {weathers}'][tone])
     end = random.choice(doc['Outro'][tone])
 
-    formed_middle = add_selections_to_tweet(middle, results)
+    formed_middle = add_selections_to_tweet2(middle, results)
 
     tweet_construction = []
     if random.random() > prob_of_no_intro:
