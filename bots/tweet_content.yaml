@@ -79,7 +79,7 @@ Intro:
     - Deep breaths...
 
 
-Weather text 1:
+Selection text 1:
   Green:
     - Looks like it's best to run in the NOUN.
     - The NOUN is the best time to run I reckon.
@@ -114,7 +114,7 @@ Weather text 1:
 
 
 
-Weather text 2:
+Selection text 2:
   Green:
     - Either in the NOUN or NOUN works, go for it!
     - It's the NOUN or NOUN, take ya pick.
@@ -127,7 +127,7 @@ Weather text 2:
 
   Red:
 
-Weather text 3:
+Selection text 3:
   Green:
     - Good all round, but the running order is 1st NOUN, 2nd NOUN and 3rd NOUN.
     - All good options but in first place is NOUN, followed by NOUN and then NOUN (but honestly its up to you).
@@ -150,13 +150,11 @@ Outro:
     - This has been a message from your neighbourhood friendly bot
     - K bye
     - Love ya, bye
-    - xxx
     - Much love x
     - Enjoy!
     - Happy running
     - Go have fun
     - Kind regards, @weather_to_run x
-    - x
     - Go get 'em
     - Have fun
     - Go go go!
