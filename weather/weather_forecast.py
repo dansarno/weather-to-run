@@ -1,12 +1,15 @@
-import weather.weather_config
+import weather_config
 import os
 import credentials as cred
+import numpy as np
 import requests
-from datetime import datetime, time
+import datetime
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator
 import json
+from scipy.interpolate import interp1d
+import scipy.ndimage
 
 
 def fetch_forecast(is_local, location=(51.5074, 0.1278)):
@@ -46,8 +49,8 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
 
     windowed_forecasts = {window_name: [] for window_name in time_windows.keys()}
     for hour_forecast in hourly_forecast:
-        this_datetime = datetime.fromtimestamp(hour_forecast["dt"])
-        is_next_day = datetime.now().day + 1 == this_datetime.day
+        this_datetime = datetime.datetime.fromtimestamp(hour_forecast["dt"])
+        is_next_day = datetime.datetime.now().day + 1 == this_datetime.day
         if not is_next_day:
             continue
 
@@ -59,7 +62,7 @@ def filter_forecasts(hourly_forecast, daily_forecast, time_windows):
 
     # TODO datetime.now() may be problematic for the deployed app
     tomorrows_summary = [day_forecast for day_forecast in daily_forecast
-                         if datetime.fromtimestamp(day_forecast["dt"]).day == datetime.now().day + 1][0]
+                         if datetime.datetime.fromtimestamp(day_forecast["dt"]).day == datetime.datetime.now().day + 1][0]
 
     return windowed_forecasts, tomorrows_summary
 
@@ -94,37 +97,61 @@ def score_forecast(hour_forecast, what_to_score):
 def wind_speed_to_score(wind_speed):
     # Empirical score (9-best, 0-worst) based off the Beaufort scale
     score = 10 - ((wind_speed ** (7 / 6)) / 6)
-    return round(min(max(score, 0), 9), 2)
+    return round(min(max(score, 0), 9), 1)
 
 
 def temp_c_to_score(temp_c):
     # Empirical score (9-best, 0-worst)
     score = (-0.023 * (temp_c - 20) ** 2) + 9
-    return round(min(max(score, 0), 9), 2)
+    return round(min(max(score, 0), 9), 1)
 
 
 def _plot_scores(hourly_forecast, what_to_score, time_windows):
-    all_scores = [score_forecast(hour_forecast, what_to_score) for hour_forecast in hourly_forecast]
-    forecast_times = [datetime.fromtimestamp(hour["dt"]).strftime("%d, %H:%M") for hour in hourly_forecast]
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    all_scores = [score_forecast(hour_forecast, what_to_score) for hour_forecast in hourly_forecast
+                  if datetime.datetime.fromtimestamp(hour_forecast["dt"]).date() == tomorrow]
+    temp, wind, precip = list(zip(*all_scores))
+    forecast_times = [datetime.datetime.fromtimestamp(hour["dt"]) for hour in hourly_forecast
+                      if datetime.datetime.fromtimestamp(hour["dt"]).date() == tomorrow]
+    times = [int(time.strftime("%H")) for time in forecast_times]
+
+    f_t = interp1d(times, temp, kind='linear')
+    f_w = interp1d(times, wind, kind='linear')
+    f_p = interp1d(times, precip, kind='linear')
+
+    x_smooth = np.linspace(min(times), max(times), 200)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
     for window_name, window_times in time_windows.items():
         rect_width = max(window_times).hour - min(window_times).hour
-        x = min(window_times).hour + (24 - datetime.now().hour)
-        rect = patches.Rectangle((x, 0), rect_width, 9, edgecolor='none', facecolor='gray', alpha=95)
+        x = min(window_times).hour
+        rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor='gray', alpha=200)
         ax.add_patch(rect)
 
-    ax.plot(forecast_times, all_scores)
-    ax.set_xlabel("Datetime")
-    ax.set_ylabel("Score")
-    ax.xaxis.set_tick_params(rotation=30)
-    ax.xaxis.set_major_locator(MultipleLocator(5))
+        ax.text(((max(window_times).hour + min(window_times).hour) / 2) - 0.2,
+                1.7,
+                window_name.upper(),
+                color='white',
+                rotation=90,
+                fontsize=15,
+                fontweight='bold',
+                zorder=1
+                )
+
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_p(x_smooth), 3) + 1)
+    # ax.set_ylabel("Score")
+    # ax.xaxis.set_tick_params(rotation=90)
+    ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_major_locator(MultipleLocator(1))
-    ax.set_ylim([0, 9.5])
+    ax.set_ylim([1, 10.5])
+    ax.set_xlim([3.7, 22.5])
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
     plt.show()
 
 
