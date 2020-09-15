@@ -1,5 +1,5 @@
-import weather_config as config
-import weather_forecast as fcast
+import weather.weather_config as config
+import weather.weather_forecast as fcast
 import datetime
 
 

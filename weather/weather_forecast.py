@@ -1,4 +1,4 @@
-import weather_config
+import weather.weather_config
 import os
 import credentials as cred
 import requests

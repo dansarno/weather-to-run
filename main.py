@@ -1,12 +1,18 @@
 import weather.weather as weather
-import weather.weather_config as config
 import time
+import bots.tweet_composer as composer
 
-location = config.LOCATION
 
-while True:
-    tomorrow = weather.Day()
-    tomorrow.score_forecast()
-    tomorrow.rank_segments()
+def rankings_interpreter(rankings):
+    pass
+    # return tone, selections
 
-    time.sleep(24*60*60)
+# while True:
+tomorrow = weather.Day()
+tomorrow.score_forecast()
+tomorrow.rank_segments()
+
+templates = composer.get_tweet_templates("bots/tweet_content.yaml")
+composer.compose_tweet(tomorrow.rankings["Green"][0], templates)
+
+# time.sleep(24*60*60)
