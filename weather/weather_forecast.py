@@ -121,7 +121,7 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
 
     x_smooth = np.linspace(min(times), max(times), 200)
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(5.5, 2.5))
     ax = fig.add_subplot(111)
 
     for window_name, window_times in time_windows.items():
@@ -140,10 +140,10 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
                 zorder=1
                 )
 
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1)
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1, color='red')
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1, color='blue')
     ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_p(x_smooth), 3) + 1)
-    # ax.set_ylabel("Score")
+    ax.set_ylabel("SCORE")
     # ax.xaxis.set_tick_params(rotation=90)
     ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_major_locator(MultipleLocator(1))
