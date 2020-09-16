@@ -203,8 +203,9 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
     ax4.text(1.3, -0.2, "A: 5% 0mm", color='#7691ad', fontsize=12)
     ax4.text(1.3, -0.8, "E: 7% 0mm", color='#7691ad', fontsize=12)
 
-    ax5 = fig.add_subplot(gs[0, 2])
-    im = mpimg.imread('bot.png')
+    ax5 = fig.add_axes([0.46, 0.89, 0.06, 0.06])
+    # ax5 = fig.add_subplot(gs[0, 2])
+    im = mpimg.imread('bot_2.png')
     ax5.imshow(im)
     ax5.xaxis.set_visible(False)
     ax5.yaxis.set_visible(False)
