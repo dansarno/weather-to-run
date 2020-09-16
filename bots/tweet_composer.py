@@ -42,7 +42,7 @@ def compose_tweet(selections, templates_dict, config=config):
 
 if __name__ == "__main__":
     tone = "Green"
-    results = ["afternoon"]
+    results = ["afternoon", "evening", "morning"]
 
     templates = get_tweet_templates()
 
