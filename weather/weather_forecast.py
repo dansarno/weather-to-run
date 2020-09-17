@@ -109,6 +109,10 @@ def temp_c_to_score(temp_c):
 
 
 def _plot_scores(hourly_forecast, what_to_score, time_windows):
+
+    # TODO: This ploting protol needs porting over to main where it can be integrated with true weather data
+    # TODO: Also need to sort out how to gradient the segment patches so they fade out towards the top
+
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     all_scores = [score_forecast(hour_forecast, what_to_score) for hour_forecast in hourly_forecast
                   if datetime.datetime.fromtimestamp(hour_forecast["dt"]).date() == tomorrow]
