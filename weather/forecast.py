@@ -222,23 +222,22 @@ def _plot_scores(hourly_forecast, what_to_score, time_windows):
     plt.show()
 
 
-def when_to_run(time_windows, is_local=True, is_debug=True):
-    hourly_forecast, daily_forecast = fetch_forecast(is_local)
-    if is_debug:
-        _plot_scores(hourly_forecast, config.WEATHER_PARAMETERS, time_windows)
-    windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
-    highest_score = -1
-    best_time = ""  # likely need changing
-    for window_name, forecast in windowed_forecasts.items():
-        this_windows_score = score_window_and_why(
-            aggregate_scores(forecast, config.WEATHER_PARAMETERS), config.WEATHER_PARAMETERS)[0]
-        is_a_better_time = highest_score < this_windows_score
-        if is_a_better_time:
-            highest_score = this_windows_score
-            best_time = window_name
-    return best_time
+# def when_to_run(time_windows, is_local=True, is_debug=True):
+#     hourly_forecast, daily_forecast = fetch_forecast(is_local)
+#     if is_debug:
+#         _plot_scores(hourly_forecast, config.WEATHER_PARAMETERS, time_windows)
+#     windowed_forecasts, tomorrows_summary = filter_forecasts(hourly_forecast, daily_forecast, time_windows)
+#     highest_score = -1
+#     best_time = ""  # likely need changing
+#     for window_name, forecast in windowed_forecasts.items():
+#         this_windows_score = score_window_and_why(
+#             aggregate_scores(forecast, config.WEATHER_PARAMETERS), config.WEATHER_PARAMETERS)[0]
+#         is_a_better_time = highest_score < this_windows_score
+#         if is_a_better_time:
+#             highest_score = this_windows_score
+#             best_time = window_name
+#     return best_time
 
 
 if __name__ == "__main__":
-    outcome = when_to_run(config.TIME_WINDOWS)
-    print(outcome.title())
+    pass
