@@ -1,5 +1,5 @@
-from weather import weather_config as config
-from weather import weather_forecast as fcast
+from weather import config
+from weather import forecast
 import datetime
 
 
@@ -64,7 +64,7 @@ class Day(TimePeriod):
                f"({', '.join([segment.name.title() for segment in self.segments])}))"
 
     def add_forecast(self):
-        hourly_forecasts, daily_forecasts = fcast.fetch_forecast(is_Local, location=self.location["London"])
+        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(is_Local, location=self.location["London"])
         day_temps = []
         for hour_forecast in hourly_forecasts:
             is_this_day = self.date == datetime.datetime.fromtimestamp(hour_forecast["dt"]).date()
@@ -91,8 +91,8 @@ class Day(TimePeriod):
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
         for hour in self.hours:
-            hour.temp_score = fcast.temp_c_to_score(hour.temp_c)
-            hour.wind_score = fcast.wind_speed_to_score(hour.wind_mps)
+            hour.temp_score = forecast.temp_c_to_score(hour.temp_c)
+            hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
         for segment in self.segments:
