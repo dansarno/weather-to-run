@@ -1,5 +1,6 @@
 import time
 from weather import day_weather
+from weather import forecast
 from bots import tweet_composer
 
 
@@ -23,6 +24,7 @@ tomorrow = day_weather.Day()
 tomorrow.score_forecast()
 tomorrow.rank_segments()
 choices, tone = rankings_interpreter(tomorrow.rankings)
+forecast.plot_scores(tomorrow)
 
 tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
 tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
