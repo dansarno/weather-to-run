@@ -1,4 +1,4 @@
-import bots.tweet_config as config
+from bots import tweet_config as config
 import yaml
 import numpy as np
 import random

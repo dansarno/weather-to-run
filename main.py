@@ -14,6 +14,10 @@ def rankings_interpreter(rankings):
     return segments, alert_level
 
 
+def generate_dashboard_image(day):
+    pass
+
+
 # while True:
 tomorrow = weather.Day()
 tomorrow.score_forecast()

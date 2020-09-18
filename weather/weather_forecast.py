@@ -1,4 +1,4 @@
-import weather.weather_config
+from weather import weather_config
 import os
 import credentials as cred
 import numpy as np

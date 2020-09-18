@@ -1,4 +1,4 @@
-import config
+from bots import config
 
 # Create API object
 api = config.create_api(True)
