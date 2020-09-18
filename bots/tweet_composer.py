@@ -23,7 +23,7 @@ def get_tweet_templates(yaml_filename="tweet_content.yaml"):
     return templates_dict
 
 
-def compose_tweet(selections, templates_dict, config=config):
+def compose_tweet(selections, tone, templates_dict, config=config):
     intro_text = random.choice(templates_dict['Intro'][tone])
     selection_text = random.choice(templates_dict[f'Selection text {len(selections)}'][tone])
     outro_text = random.choice(templates_dict['Outro'][tone])
@@ -41,11 +41,11 @@ def compose_tweet(selections, templates_dict, config=config):
 
 
 if __name__ == "__main__":
-    tone = "Green"
+    level = "Green"
     results = ["afternoon", "evening", "morning"]
 
     templates = get_tweet_templates()
 
     for _ in range(100):
-        a_tweet = compose_tweet(results, templates, config)
+        a_tweet = compose_tweet(results, level, templates, config)
         print(a_tweet)

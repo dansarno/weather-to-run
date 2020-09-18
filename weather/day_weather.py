@@ -108,25 +108,18 @@ class Day(TimePeriod):
 
         seg_and_worst_score = []
         for segment in segments_to_rank:
+            # Out of temp, wind, precip... which is the worst and whats its score
             worst_score = segment.judge_score()
             seg_and_worst_score.append([segment, worst_score])
+        # Sort segments by worst score
         ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
 
         self.rankings = {"Green": [], "Amber": [], "Red": []}  # reset rankings
-        prev_worst = 0
         for segment, worst_score in ordered_seg_and_worst_score:
             for name, segment_list in self.rankings.items():
                 if not segment.alert_level.lower() == name.lower():
                     continue
-                if prev_worst != worst_score:
-                    segment_list.append(segment)
-                else:
-                    prev_el = segment_list[-1]
-                    if isinstance(prev_el, list):
-                        segment_list[-1] = segment_list[-1].append(segment)
-                    else:
-                        segment_list[-1] = [segment_list[-1], segment]
-            prev_worst = worst_score
+                segment_list.append(segment)
 
     def weather_at_time(self, time):
         pass
