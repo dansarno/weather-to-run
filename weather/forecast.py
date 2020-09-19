@@ -79,7 +79,7 @@ def plot_scores(day, to_show):
     fig.text(0.6, 0.9, day.date.strftime("%d.%m.%y"), color='white', fontsize=16, fontweight='bold')
 
     for name, seg in day.segments.items():
-        rect_width = seg.duration
+        rect_width = seg.duration + 0.9
         x = seg.start_time.hour
         rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor='#30475e')
         ax.add_patch(rect)
@@ -103,7 +103,7 @@ def plot_scores(day, to_show):
     ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_major_locator(MultipleLocator(1))
     ax.set_ylim([1, 10.5])
-    ax.set_xlim([3.7, 22.5])
+    ax.set_xlim([4.7, 23.5])
     ax.tick_params(axis='x', colors='white')
     ax.tick_params(axis='y', colors='white')
     ax.spines['top'].set_visible(False)
@@ -157,16 +157,16 @@ def plot_scores(day, to_show):
     ax4.text(1.3, -0.8, f"E: {day.segments['evening'].precipitation_prob}% "
                         f"{day.segments['evening'].precipitation_mm}mm", color='#7691ad', fontsize=12)
 
-    # ax5 = fig.add_axes([0.59, 0.12, 0.2, 0.2])
-    # im = mpimg.imread('my_bot.png')
-    # ax5.imshow(im)
-    # ax5.xaxis.set_visible(False)
-    # ax5.yaxis.set_visible(False)
-    # ax5.set_facecolor('#222831')
-    # ax5.spines['right'].set_visible(False)
-    # ax5.spines['left'].set_visible(False)
-    # ax5.spines['bottom'].set_visible(False)
-    # ax5.spines['top'].set_visible(False)
+    ax5 = fig.add_axes([0.59, 0.12, 0.2, 0.2])
+    im = mpimg.imread('art/my_bot.png')
+    ax5.imshow(im)
+    ax5.xaxis.set_visible(False)
+    ax5.yaxis.set_visible(False)
+    ax5.set_facecolor('#222831')
+    ax5.spines['right'].set_visible(False)
+    ax5.spines['left'].set_visible(False)
+    ax5.spines['bottom'].set_visible(False)
+    ax5.spines['top'].set_visible(False)
 
     if to_show:
         plt.show()

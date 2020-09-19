@@ -1,9 +1,16 @@
 import datetime
 
 TIME_WINDOWS = {
-    "morning": [datetime.time(hour=6), datetime.time(hour=9)],
-    "afternoon": [datetime.time(hour=12), datetime.time(hour=14)],
-    "evening": [datetime.time(hour=17), datetime.time(hour=21)]
+    "weekday": {
+        "morning": [datetime.time(hour=6), datetime.time(hour=9)],
+        "afternoon": [datetime.time(hour=12), datetime.time(hour=14)],
+        "evening": [datetime.time(hour=17), datetime.time(hour=21)]
+        },
+    "weekend": {
+        "morning": [datetime.time(hour=6), datetime.time(hour=11)],
+        "afternoon": [datetime.time(hour=12), datetime.time(hour=16)],
+        "evening": [datetime.time(hour=17), datetime.time(hour=21)]
+        }
 }
 
 WEATHER_PARAMETERS = ["temperature", "wind", "precipitation"]

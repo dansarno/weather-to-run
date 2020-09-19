@@ -2,8 +2,6 @@ from weather import config
 from weather import forecast
 import datetime
 
-
-TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
 is_Local = True
 
 
@@ -46,14 +44,20 @@ class TimePeriod(TimeElement):
 
 
 class Day(TimePeriod):
+    TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
+
     def __init__(self, date=TOMORROW, segments=config.TIME_WINDOWS):
         super().__init__()
         self.sunrise = 0
         self.sunset = 0
         self.date = date
         self.location = config.LOCATION
-        self.segments = {name: DaySegment(name, times[0], times[1]) for name, times in segments.items()}
         self.rankings = {"Green": [], "Amber": [], "Red": []}
+        if date.isoweekday() in {6, 7}:  # i.e. is it the weekend?
+            day_type = "weekend"
+        else:
+            day_type = "weekday"
+        self.segments = {name: DaySegment(name, times[0], times[1]) for name, times in segments[day_type].items()}
 
         self.add_forecast()
 
@@ -77,7 +81,7 @@ class Day(TimePeriod):
             this_hour.wind_mps = hour_forecast["wind_speed"]
             this_hour.precipitation_type = str(int(hour_forecast["weather"][0]["id"]))
             this_hour.precipitation_prob = hour_forecast["pop"]
-            if hour_forecast["pop"] != 0:
+            if "rain" in hour_forecast.keys():
                 this_hour.precipitation_mm = hour_forecast["rain"]["1h"]
             self.hours.append(this_hour)  # add this hour to the day's hours list
             day_temps.append(hour_forecast["feels_like"])
