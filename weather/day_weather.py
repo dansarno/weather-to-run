@@ -15,6 +15,8 @@ class TimeElement:
         self.wind_score = 0
         self.precipitation_type = ""
         self.precipitation_score = 0
+        self.precipitation_prob = 0
+        self.precipitation_mm = 0
 
 
 class TimePeriod(TimeElement):
@@ -71,13 +73,16 @@ class Day(TimePeriod):
             if not is_this_day:
                 continue
             this_hour = Hour(datetime.datetime.fromtimestamp(hour_forecast["dt"]).hour)
-            this_hour.temp_c = hour_forecast["feels_like"]
+            this_hour.temp_c = hour_forecast["feels_like"]  # Using "feels like" temp makes sense for scoring
             this_hour.wind_mps = hour_forecast["wind_speed"]
             this_hour.precipitation_type = str(int(hour_forecast["weather"][0]["id"]))
-            self.hours.append(this_hour)
+            this_hour.precipitation_prob = hour_forecast["pop"]
+            if hour_forecast["pop"] != 0:
+                this_hour.precipitation_mm = hour_forecast["rain"]["1h"]
+            self.hours.append(this_hour)  # add this hour to the day's hours list
             day_temps.append(hour_forecast["feels_like"])
 
-        self._filter_forecast()
+        self._segment_forecast()
 
         for day_forecast in daily_forecasts:
             is_this_day = self.date == datetime.datetime.fromtimestamp(day_forecast["dt"]).date()
@@ -88,6 +93,9 @@ class Day(TimePeriod):
             self.temp_c = round(sum(day_temps) / len(day_temps), 2)  # Using average daily temperature for now
             self.wind_mps = day_forecast["wind_speed"]
             self.precipitation_type = str(int(day_forecast["weather"][0]["id"]))
+            self.precipitation_prob = day_forecast["pop"]
+            if day_forecast["pop"] != 0:
+                self.precipitation_mm = day_forecast["rain"]
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
         for hour in self.hours:
@@ -124,7 +132,7 @@ class Day(TimePeriod):
     def weather_at_time(self, time):
         pass
 
-    def _filter_forecast(self):
+    def _segment_forecast(self):
         for hour in self.hours:
             # Check if this hour is within any of the time segments
             for segment in self.segments:
@@ -155,10 +163,14 @@ class DaySegment(TimePeriod):
         all_temp_c = [hour.temp_c for hour in self.hours]
         all_wind_mps = [hour.wind_mps for hour in self.hours]
         all_precip_types = [hour.precipitation_type for hour in self.hours]
+        all_precip_probs = [hour.precipitation_prob for hour in self.hours]
+        all_precip_mm = [hour.precipitation_mm for hour in self.hours]
 
         self.temp_c = round(sum(all_temp_c) / len(all_temp_c), 2)
         self.wind_mps = round(sum(all_wind_mps) / len(all_wind_mps), 2)
         self.precipitation_type = all_precip_types[len(all_precip_types) // 2]  # this may need changing!
+        self.precipitation_prob = round(sum(all_precip_probs) / len(all_precip_probs), 2)  # this may need changing!
+        self.precipitation_mm = round(sum(all_precip_mm) / len(all_precip_mm), 2)  # this may need changing!
 
 
 class Hour(TimeElement):
