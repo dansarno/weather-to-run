@@ -61,7 +61,7 @@ def plot_scores(day, to_show):
 
     x_smooth = np.linspace(min(times), max(times), 200)
 
-    fig = plt.figure(figsize=(10, 4.5))
+    fig = plt.figure(figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.07, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
     fig.patch.set_facecolor('#222831')
