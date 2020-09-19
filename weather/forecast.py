@@ -70,8 +70,8 @@ def plot_scores(day):
     fig.text(0.05, 0.9, "Weather to run or bot".upper(), color='white', fontsize=20, fontweight='bold')
 
     fig.text(0.05, 0.8, "LOCATION: LONDON, UK", color='#7691ad', fontsize=12)
-    fig.text(0.05, 0.75, "SUNRISE: 06:48", color='#7691ad', fontsize=12)
-    fig.text(0.05, 0.7, "SUNSET: 19:28", color='#7691ad', fontsize=12)
+    fig.text(0.05, 0.75, f"SUNRISE: {day.sunrise.strftime('%H:%M')}", color='#7691ad', fontsize=12)
+    fig.text(0.05, 0.7, f"SUNSET: {day.sunset.strftime('%H:%M')}", color='#7691ad', fontsize=12)
     fig.text(0.3, 0.8, "WEEKS TILL SPRING RACES: 26", color='#7691ad', fontsize=12)
     fig.text(0.3, 0.75, "WEEKS TILL AUTUMN RACES: 3", color='#7691ad', fontsize=12)
     fig.text(0.3, 0.7, "YEAR PROGRESS: 80%", color='#7691ad', fontsize=12)
@@ -112,8 +112,16 @@ def plot_scores(day):
     ax.spines['bottom'].set_color('white')
 
     ax2 = fig.add_subplot(gs[0, -1])
-    groups = [70, 30]
-    ax2.pie(groups, colors=['#46b5d1', '#222831'], startangle=90, counterclock=False)
+    max_temp = 40  # C
+    ccw = False
+    if day.temp_c > 0:
+        groups = [day.temp_c / max_temp, 1 - day.temp_c / max_temp]
+    elif day.temp_c == 0:
+        groups = [0.01, 0.99]
+    else:
+        groups = [abs(day.temp_c) / max_temp, 1 - abs(day.temp_c) / max_temp]
+        ccw = True
+    ax2.pie(groups, colors=['#46b5d1', '#222831'], startangle=90, counterclock=ccw)
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax2.add_artist(my_circle)
     ax2.text(-0.2, -0.2, "T", color='white', fontsize=17)
@@ -122,7 +130,8 @@ def plot_scores(day):
     ax2.text(1.3, -0.8, f"E: {day.segments[2].temp_c}C", color='#7691ad', fontsize=12)
 
     ax3 = fig.add_subplot(gs[1, -1])
-    groups = [40, 60]
+    max_wind = 30  # mps
+    groups = [day.wind_mps / max_wind, 1 - day.wind_mps / max_wind]
     ax3.pie(groups, colors=['#29c7ac', '#222831'], startangle=90, counterclock=False)
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax3.add_artist(my_circle)
@@ -132,14 +141,21 @@ def plot_scores(day):
     ax3.text(1.3, -0.8, f"E: {day.segments[2].wind_mps}mps", color='#7691ad', fontsize=12)
 
     ax4 = fig.add_subplot(gs[2, -1])
-    groups = [85, 15]
+    max_precip = 20  # mm
+    if day.precipitation_mm != 0:
+        groups = [day.precipitation_mm / max_precip, 1 - day.precipitation_mm / max_precip]
+    else:
+        groups = [0.01, 0.99]
     ax4.pie(groups, colors=['#f30a49', '#222831'], startangle=90, counterclock=False)
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax4.add_artist(my_circle)
     ax4.text(-0.2, -0.2, "P", color='white', fontsize=17)
-    ax4.text(1.3, 0.4, f"M: 12% 0mm", color='#7691ad', fontsize=12)
-    ax4.text(1.3, -0.2, f"A: 5% 0mm", color='#7691ad', fontsize=12)
-    ax4.text(1.3, -0.8, f"E: 7% 0mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, 0.4, f"M: {day.segments[0].precipitation_prob}% "
+                       f"{day.segments[0].precipitation_mm}mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, -0.2, f"A: {day.segments[1].precipitation_prob}% "
+                        f"{day.segments[1].precipitation_mm}mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, -0.8, f"E: {day.segments[2].precipitation_prob}% "
+                        f"{day.segments[2].precipitation_mm}mm", color='#7691ad', fontsize=12)
 
     # ax5 = fig.add_axes([0.59, 0.12, 0.2, 0.2])
     # im = mpimg.imread('my_bot.png')
