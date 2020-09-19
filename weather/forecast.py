@@ -1,16 +1,14 @@
-from weather import config
 import os
 import credentials as cred
 import numpy as np
 import requests
-import datetime
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator
-import json
 from scipy.interpolate import interp1d
 import scipy.ndimage
 import matplotlib.image as mpimg
+from weather import dashboard_colours as colours
 
 
 def fetch_forecast(is_local, location=(51.5074, 0.1278)):
@@ -64,24 +62,24 @@ def plot_scores(day, to_show):
     fig = plt.figure(figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.07, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
-    fig.patch.set_facecolor('#222831')
+    fig.patch.set_facecolor(colours.background)
     ax = fig.add_subplot(gs[-2:, :-1])
 
     fig.text(0.05, 0.9, "Weather to run or bot".upper(), color='white', fontsize=20, fontweight='bold')
 
-    fig.text(0.05, 0.8, "LOCATION: LONDON, UK", color='#7691ad', fontsize=12)
-    fig.text(0.05, 0.75, f"SUNRISE: {day.sunrise:%H:%M}", color='#7691ad', fontsize=12)
-    fig.text(0.05, 0.7, f"SUNSET: {day.sunset:%H:%M}", color='#7691ad', fontsize=12)
-    fig.text(0.3, 0.8, "WEEKS TILL SPRING RACES: 26", color='#7691ad', fontsize=12)
-    fig.text(0.3, 0.75, "WEEKS TILL AUTUMN RACES: 3", color='#7691ad', fontsize=12)
-    fig.text(0.3, 0.7, "YEAR PROGRESS: 80%", color='#7691ad', fontsize=12)
+    fig.text(0.05, 0.8, "LOCATION: LONDON, UK", color=colours.info_text, fontsize=12)
+    fig.text(0.05, 0.75, f"SUNRISE: {day.sunrise:%H:%M}", color=colours.info_text, fontsize=12)
+    fig.text(0.05, 0.7, f"SUNSET: {day.sunset:%H:%M}", color=colours.info_text, fontsize=12)
+    fig.text(0.3, 0.8, "WEEKS TILL SPRING RACES: 26", color=colours.info_text, fontsize=12)
+    fig.text(0.3, 0.75, "WEEKS TILL AUTUMN RACES: 3", color=colours.info_text, fontsize=12)
+    fig.text(0.3, 0.7, "YEAR PROGRESS: 80%", color=colours.info_text, fontsize=12)
 
     fig.text(0.6, 0.9, f"{day.date:%d.%m.%y}", color='white', fontsize=16, fontweight='bold')
 
     for name, seg in day.segments.items():
         rect_width = seg.duration + 0.9
         x = seg.start_time.hour
-        rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor='#30475e')
+        rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor=colours.segments)
         ax.add_patch(rect)
 
         ax.text(((seg.end_time.hour + seg.start_time.hour) / 2) - 0.2,
@@ -94,7 +92,7 @@ def plot_scores(day, to_show):
                 zorder=1
                 )
 
-    ax.set_facecolor('#222831')
+    ax.set_facecolor(colours.background)
     ax.xaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_major_locator(MultipleLocator(1))
     ax.set_ylim([1, 10.5])
@@ -106,9 +104,9 @@ def plot_scores(day, to_show):
     ax.spines['left'].set_visible(False)
     ax.spines['bottom'].set_color('white')
 
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1, color='#46b5d1', linewidth=4.0, zorder=5)
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1, color='#29c7ac', linewidth=4.0, zorder=5)
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_p(x_smooth), 3) + 1, color='#f30a49', linewidth=4.0, zorder=5)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1, color=colours.temp, linewidth=4.0, zorder=5)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1, color=colours.wind, linewidth=4.0, zorder=5)
+    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_p(x_smooth), 3) + 1, color=colours.precip, linewidth=4.0, zorder=5)
     ax.set_ylabel("BOT RATING", color='white')
 
     ax2 = fig.add_subplot(gs[0, -1])
@@ -121,24 +119,24 @@ def plot_scores(day, to_show):
     else:
         groups = [abs(day.temp_c) / max_temp, 1 - abs(day.temp_c) / max_temp]
         ccw = True
-    ax2.pie(groups, colors=['#46b5d1', '#222831'], startangle=90, counterclock=ccw)
-    my_circle = plt.Circle((0, 0), 0.7, color='#222831')
+    ax2.pie(groups, colors=[colours.temp, colours.background], startangle=90, counterclock=ccw)
+    my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
     ax2.add_artist(my_circle)
     ax2.text(-0.2, -0.2, "T", color='white', fontsize=17)
-    ax2.text(1.3, 0.4, f"M: {day.segments['morning'].temp_c:.1f}C", color='#7691ad', fontsize=12)
-    ax2.text(1.3, -0.2, f"A: {day.segments['afternoon'].temp_c:.1f}C", color='#7691ad', fontsize=12)
-    ax2.text(1.3, -0.8, f"E: {day.segments['evening'].temp_c:.1f}C", color='#7691ad', fontsize=12)
+    ax2.text(1.3, 0.4, f"M: {day.segments['morning'].temp_c:.1f}C", color=colours.info_text, fontsize=12)
+    ax2.text(1.3, -0.2, f"A: {day.segments['afternoon'].temp_c:.1f}C", color=colours.info_text, fontsize=12)
+    ax2.text(1.3, -0.8, f"E: {day.segments['evening'].temp_c:.1f}C", color=colours.info_text, fontsize=12)
 
     ax3 = fig.add_subplot(gs[1, -1])
     max_wind = 30  # mps
     groups = [day.wind_mps / max_wind, 1 - day.wind_mps / max_wind]
-    ax3.pie(groups, colors=['#29c7ac', '#222831'], startangle=90, counterclock=False)
-    my_circle = plt.Circle((0, 0), 0.7, color='#222831')
+    ax3.pie(groups, colors=[colours.wind, colours.background], startangle=90, counterclock=False)
+    my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
     ax3.add_artist(my_circle)
     ax3.text(-0.2, -0.2, "W", color='white', fontsize=17)
-    ax3.text(1.3, 0.4, f"M: {day.segments['morning'].wind_mps:.1f}mps", color='#7691ad', fontsize=12)
-    ax3.text(1.3, -0.2, f"A: {day.segments['afternoon'].wind_mps:.1f}mps", color='#7691ad', fontsize=12)
-    ax3.text(1.3, -0.8, f"E: {day.segments['evening'].wind_mps:.1f}mps", color='#7691ad', fontsize=12)
+    ax3.text(1.3, 0.4, f"M: {day.segments['morning'].wind_mps:.1f}mps", color=colours.info_text, fontsize=12)
+    ax3.text(1.3, -0.2, f"A: {day.segments['afternoon'].wind_mps:.1f}mps", color=colours.info_text, fontsize=12)
+    ax3.text(1.3, -0.8, f"E: {day.segments['evening'].wind_mps:.1f}mps", color=colours.info_text, fontsize=12)
 
     ax4 = fig.add_subplot(gs[2, -1])
     max_precip = 20  # mm
@@ -146,23 +144,23 @@ def plot_scores(day, to_show):
         groups = [day.precipitation_mm / max_precip, 1 - day.precipitation_mm / max_precip]
     else:
         groups = [0.01, 0.99]
-    ax4.pie(groups, colors=['#f30a49', '#222831'], startangle=90, counterclock=False)
-    my_circle = plt.Circle((0, 0), 0.7, color='#222831')
+    ax4.pie(groups, colors=[colours.precip, colours.background], startangle=90, counterclock=False)
+    my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
     ax4.add_artist(my_circle)
     ax4.text(-0.2, -0.2, "P", color='white', fontsize=17)
     ax4.text(1.3, 0.4, f"M: {(day.segments['morning'].precipitation_prob * 100):.0f}% "
-                       f"{day.segments['morning'].precipitation_mm:.0f}mm", color='#7691ad', fontsize=12)
+                       f"{day.segments['morning'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
     ax4.text(1.3, -0.2, f"A: {(day.segments['afternoon'].precipitation_prob * 100):.0f}% "
-                        f"{day.segments['afternoon'].precipitation_mm:.0f}mm", color='#7691ad', fontsize=12)
+                        f"{day.segments['afternoon'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
     ax4.text(1.3, -0.8, f"E: {(day.segments['evening'].precipitation_prob * 100):.0f}% "
-                        f"{day.segments['evening'].precipitation_mm:.0f}mm", color='#7691ad', fontsize=12)
+                        f"{day.segments['evening'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
 
     ax5 = fig.add_axes([0.59, 0.12, 0.2, 0.2])
     im = mpimg.imread('art/my_bot.png')
     ax5.imshow(im)
     ax5.xaxis.set_visible(False)
     ax5.yaxis.set_visible(False)
-    ax5.set_facecolor('#222831')
+    ax5.set_facecolor(colours.background)
     ax5.spines['right'].set_visible(False)
     ax5.spines['left'].set_visible(False)
     ax5.spines['bottom'].set_visible(False)

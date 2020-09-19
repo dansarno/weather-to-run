@@ -1,0 +1,6 @@
+background = '#222831'
+segments = '#30475e'
+temp = '#f30a49'
+wind = '#29c7ac'
+precip = '#46b5d1'
+info_text = '#7691ad'
