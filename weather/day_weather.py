@@ -52,18 +52,18 @@ class Day(TimePeriod):
         self.sunset = 0
         self.date = date
         self.location = config.LOCATION
-        self.segments = [DaySegment(name, times[0], times[1]) for name, times in segments.items()]
+        self.segments = {name: DaySegment(name, times[0], times[1]) for name, times in segments.items()}
         self.rankings = {"Green": [], "Amber": [], "Red": []}
 
         self.add_forecast()
 
     def __str__(self):
         return f"Day with date {self.date.strftime('%d/%m/%y')} and {len(self.segments)} segments: " \
-               f"{', '.join([segment.name.title() for segment in self.segments])}"
+               f"{', '.join([name.title() for name, segment in self.segments.items()])}"
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.date.strftime('%d/%m/%y')}, " \
-               f"({', '.join([segment.name.title() for segment in self.segments])}))"
+               f"({', '.join([name.title() for name, segment in self.segments.items()])}))"
 
     def add_forecast(self):
         hourly_forecasts, daily_forecasts = forecast.fetch_forecast(is_Local, location=self.location["London"])
@@ -103,7 +103,7 @@ class Day(TimePeriod):
             hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
-        for segment in self.segments:
+        for seg_name, segment in self.segments.items():
             segment.average_score()
 
         self.average_score()
@@ -112,7 +112,7 @@ class Day(TimePeriod):
     def rank_segments(self, segments_to_rank=None):
         # By default use all segments in the day if not specified otherwise
         if not segments_to_rank:
-            segments_to_rank = self.segments
+            segments_to_rank = list(self.segments.values())
 
         seg_and_worst_score = []
         for segment in segments_to_rank:
@@ -135,13 +135,13 @@ class Day(TimePeriod):
     def _segment_forecast(self):
         for hour in self.hours:
             # Check if this hour is within any of the time segments
-            for segment in self.segments:
+            for seg_name, segment in self.segments.items():
                 is_in_window = segment.start_time.hour <= hour.hr <= segment.end_time.hour
                 if is_in_window:
                     segment.hours.append(hour)
 
         # Update segment attributes after segments have hours
-        for segment in self.segments:
+        for seg_name, segment in self.segments.items():
             segment.average_weather()
 
 

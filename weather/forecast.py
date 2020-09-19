@@ -78,7 +78,7 @@ def plot_scores(day):
 
     fig.text(0.6, 0.9, day.date.strftime("%d.%m.%y"), color='white', fontsize=16, fontweight='bold')
 
-    for seg in day.segments:
+    for name, seg in day.segments.items():
         rect_width = seg.duration
         x = seg.start_time.hour
         rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor='#30475e')
@@ -125,9 +125,9 @@ def plot_scores(day):
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax2.add_artist(my_circle)
     ax2.text(-0.2, -0.2, "T", color='white', fontsize=17)
-    ax2.text(1.3, 0.4, f"M: {day.segments[0].temp_c}C", color='#7691ad', fontsize=12)
-    ax2.text(1.3, -0.2, f"A: {day.segments[1].temp_c}C", color='#7691ad', fontsize=12)
-    ax2.text(1.3, -0.8, f"E: {day.segments[2].temp_c}C", color='#7691ad', fontsize=12)
+    ax2.text(1.3, 0.4, f"M: {day.segments['morning'].temp_c}C", color='#7691ad', fontsize=12)
+    ax2.text(1.3, -0.2, f"A: {day.segments['afternoon'].temp_c}C", color='#7691ad', fontsize=12)
+    ax2.text(1.3, -0.8, f"E: {day.segments['evening'].temp_c}C", color='#7691ad', fontsize=12)
 
     ax3 = fig.add_subplot(gs[1, -1])
     max_wind = 30  # mps
@@ -136,9 +136,9 @@ def plot_scores(day):
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax3.add_artist(my_circle)
     ax3.text(-0.2, -0.2, "W", color='white', fontsize=17)
-    ax3.text(1.3, 0.4, f"M: {day.segments[0].wind_mps}mps", color='#7691ad', fontsize=12)
-    ax3.text(1.3, -0.2, f"A: {day.segments[1].wind_mps}mps", color='#7691ad', fontsize=12)
-    ax3.text(1.3, -0.8, f"E: {day.segments[2].wind_mps}mps", color='#7691ad', fontsize=12)
+    ax3.text(1.3, 0.4, f"M: {day.segments['morning'].wind_mps}mps", color='#7691ad', fontsize=12)
+    ax3.text(1.3, -0.2, f"A: {day.segments['afternoon'].wind_mps}mps", color='#7691ad', fontsize=12)
+    ax3.text(1.3, -0.8, f"E: {day.segments['evening'].wind_mps}mps", color='#7691ad', fontsize=12)
 
     ax4 = fig.add_subplot(gs[2, -1])
     max_precip = 20  # mm
@@ -150,12 +150,12 @@ def plot_scores(day):
     my_circle = plt.Circle((0, 0), 0.7, color='#222831')
     ax4.add_artist(my_circle)
     ax4.text(-0.2, -0.2, "P", color='white', fontsize=17)
-    ax4.text(1.3, 0.4, f"M: {day.segments[0].precipitation_prob}% "
-                       f"{day.segments[0].precipitation_mm}mm", color='#7691ad', fontsize=12)
-    ax4.text(1.3, -0.2, f"A: {day.segments[1].precipitation_prob}% "
-                        f"{day.segments[1].precipitation_mm}mm", color='#7691ad', fontsize=12)
-    ax4.text(1.3, -0.8, f"E: {day.segments[2].precipitation_prob}% "
-                        f"{day.segments[2].precipitation_mm}mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, 0.4, f"M: {day.segments['morning'].precipitation_prob}% "
+                       f"{day.segments['morning'].precipitation_mm}mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, -0.2, f"A: {day.segments['afternoon'].precipitation_prob}% "
+                        f"{day.segments['afternoon'].precipitation_mm}mm", color='#7691ad', fontsize=12)
+    ax4.text(1.3, -0.8, f"E: {day.segments['evening'].precipitation_prob}% "
+                        f"{day.segments['evening'].precipitation_mm}mm", color='#7691ad', fontsize=12)
 
     # ax5 = fig.add_axes([0.59, 0.12, 0.2, 0.2])
     # im = mpimg.imread('my_bot.png')
