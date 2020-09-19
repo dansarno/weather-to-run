@@ -9,15 +9,19 @@ def rankings_interpreter(rankings):
     # Simple ranking interpreter that returns the best ranked day segments
     segments = []
     alert_level = ""
+    is_first = True
     for level, segs in rankings.items():
         if segs:
-            segments = [seg.name for seg in segs]
-            alert_level = level
+            for seg in segs:
+                segments.append(seg.name)
+            if is_first:
+                alert_level = level
+                is_first = False
     return segments, alert_level
 
 
-def produce_dashboard_image(day, filename, to_show=False):
-    fig_handle = forecast.plot_scores(day, to_show)
+def produce_dashboard_image(day, rankings, filename, to_show=False):
+    fig_handle = forecast.plot_scores(day, rankings, to_show)
     fig_handle.savefig(filename)
 
 
@@ -28,7 +32,7 @@ tomorrow.rank_segments()
 choices, tone = rankings_interpreter(tomorrow.rankings)
 
 fname = f"dashboards/dashboard_{tomorrow.date.strftime('%d-%m-%y')}.jpg"
-produce_dashboard_image(tomorrow, fname, to_show=True)
+produce_dashboard_image(tomorrow, choices, fname, to_show=True)
 
 tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
 tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
