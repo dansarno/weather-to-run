@@ -15,8 +15,9 @@ def rankings_interpreter(rankings):
     return segments, alert_level
 
 
-def generate_dashboard_image(day):
-    pass
+def produce_dashboard_image(day, to_show=False):
+    fig_handle = forecast.plot_scores(day, to_show)
+    fig_handle.savefig(f"dashboards/dashboard_{day.date.strftime('%d-%m-%y')}.jpg")
 
 
 # while True:
@@ -24,7 +25,7 @@ tomorrow = day_weather.Day()
 tomorrow.score_forecast()
 tomorrow.rank_segments()
 choices, tone = rankings_interpreter(tomorrow.rankings)
-forecast.plot_scores(tomorrow)
+produce_dashboard_image(tomorrow)
 
 tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
 tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)

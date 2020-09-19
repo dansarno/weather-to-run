@@ -46,7 +46,7 @@ def temp_c_to_score(temp_c):
     return round(min(max(score, 0), 9), 1)
 
 
-def plot_scores(day):
+def plot_scores(day, to_show):
 
     # TODO: This plotting protocol needs porting over to main where it can be integrated with true weather data
     # TODO: Also need to sort out how to gradient the segment patches so they fade out towards the top
@@ -168,7 +168,10 @@ def plot_scores(day):
     # ax5.spines['bottom'].set_visible(False)
     # ax5.spines['top'].set_visible(False)
 
-    plt.show()
+    if to_show:
+        plt.show()
+
+    return fig
 
 
 if __name__ == "__main__":
