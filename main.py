@@ -25,22 +25,30 @@ def produce_dashboard_image(day, rankings, filename, to_show=False):
     fig_handle.savefig(filename)
 
 
-# while True:
-tomorrow = day_weather.Day()
-tomorrow.score_forecast()
-tomorrow.rank_segments()
-choices, tone = rankings_interpreter(tomorrow.rankings)
+def daily_tweet(api_obj):
+    tomorrow = day_weather.Day()
+    tomorrow.score_forecast()
+    tomorrow.rank_segments()
+    choices, tone = rankings_interpreter(tomorrow.rankings)
 
-fname = f"dashboards/dashboard_{tomorrow.date.strftime('%d-%m-%y')}.jpg"
-produce_dashboard_image(tomorrow, choices, fname, to_show=True)
+    fname = f"dashboards/dashboard_{tomorrow.date.strftime('%d-%m-%y')}.jpg"
+    produce_dashboard_image(tomorrow, choices, fname, to_show=False)
 
-tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
-tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
-print(tweet_text)
+    tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
+    tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
 
-# # Create API object
-# api = config.create_api(True)
-# # Upload media
-# media = api.media_upload(fname)  # 5MB limit
-# # Create a test tweet
-# api.update_status(status=tweet_text, media_ids=[media.media_id])
+    # Upload media
+    media = api_obj.media_upload(fname)  # 5MB limit
+    # Create a test tweet
+    api_obj.update_status(status=tweet_text, media_ids=[media.media_id])
+
+
+def tweet_your_weather():
+    pass
+
+
+if __name__ == "__main__":
+
+    # Create API object
+    api = config.create_api(True)
+    daily_tweet(api)
