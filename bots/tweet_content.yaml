@@ -101,6 +101,7 @@ Selection text 1:
     - "Q: When is the best time to run? A: The NOUN, I think 🤷‍♂️"
     - The NOUN is best for a run, that's my best guess.
     - I'm going to take a guess at... A(N) NOUN run.
+    - If you're going to run, the NOUN is looking like the only option. Well, unless you love bad weather!
 
   Red:
     - If you insist, A(N) NOUN run is the "best" time to run.
@@ -124,8 +125,17 @@ Selection text 2:
     - The NOUN is looking best. Not happy with that? The NOUN is also alright I reckon.
 
   Amber:
+    - Well, quite the day! But A(N) NOUN or NOUN run are looking like your best option.
+    - I've done a few calculations and I reckon A(N) NOUN or NOUN run are looking alright.
+    - If you're going to run, the NOUN and NOUN are your only two options.
+    - By my lights either A(N) NOUN or NOUN run will do.
+    - Tough to judge this one but a run in the NOUN or NOUN will be alright I reckon.
+    - "You got two okay-ish options: NOUN or NOUN"
+
 
   Red:
+    - Test
+
 
 Selection text 3:
   Green:
@@ -138,11 +148,17 @@ Selection text 3:
     - "1st: NOUN, 2nd: NOUN, 3rd: NOUN - but honestly run when ya like."
 
   Amber:
-
+    - Not the best out there, equally iffy in the NOUN, NOUN and NOUN.
+    - Well it has been better and honestly it up to you when you run. Less than best weather all day.
+    - I got NOUN, NOUN and NOUN. In that order.
+    - Not perfect out there I'm affraid, equally meh throughout the day.
 
   Red:
     - Equally crap all day, I'm sorry!
     - I'm sure you don't need me to say but it's less than favourable running conditions out there all day.
+    - You're not going to like this, but I'm informed it'll poor weather all day.
+    - By my calculations, it won't be good running weather condition all day!
+    - Bad all day, but if I had to pick the "best" time to run I'd say it will be the NOUN
 
 
 Outro:
@@ -225,9 +241,4 @@ Outro:
     - So sorry
     - I'll say a prayer
     - All the best
-
-
-
-
-
 
