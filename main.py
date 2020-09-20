@@ -50,5 +50,5 @@ def tweet_your_weather():
 if __name__ == "__main__":
 
     # Create API object
-    api = config.create_api(True)
+    api = config.create_api()
     daily_tweet(api)

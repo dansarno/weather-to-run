@@ -70,7 +70,7 @@ class Day(TimePeriod):
                f"({', '.join([name.title() for name, segment in self.segments.items()])}))"
 
     def add_forecast(self):
-        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(is_Local, location=self.location["London"])
+        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(location=self.location["London"])
         day_temps = []
         for hour_forecast in hourly_forecasts:
             is_this_day = self.date == datetime.datetime.fromtimestamp(hour_forecast["dt"]).date()

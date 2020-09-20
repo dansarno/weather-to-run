@@ -1,22 +1,15 @@
 import tweepy
 import logging
-import credentials as cred
 import os
 
 logger = logging.getLogger()
 
 
-def create_api(isLocal):
-    if not isLocal:
-        consumer_key = os.getenv("CONSUMER_KEY")
-        consumer_secret = os.getenv("CONSUMER_SECRET")
-        access_token = os.getenv("ACCESS_TOKEN")
-        access_token_secret = os.getenv("ACCESS_TOKEN_SECRET")
-    else:
-        consumer_key = cred.CONSUMER_KEY
-        consumer_secret = cred.CONSUMER_SECRET
-        access_token = cred.ACCESS_TOKEN
-        access_token_secret = cred.ACCESS_TOKEN_SECRET
+def create_api():
+    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+    access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+    access_token_secret = os.getenv("TWITTER_TOKEN_SECRET")
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)

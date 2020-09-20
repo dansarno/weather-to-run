@@ -1,5 +1,4 @@
 import os
-import credentials as cred
 import numpy as np
 import requests
 import matplotlib.pyplot as plt
@@ -11,11 +10,9 @@ import matplotlib.image as mpimg
 from weather import dashboard_colours as colours
 
 
-def fetch_forecast(is_local, location=(51.5074, 0.1278)):
-    if not is_local:
-        api_key = os.getenv("API_KEY")
-    else:
-        api_key = cred.API_KEY
+def fetch_forecast(location=(51.5074, 0.1278)):
+
+    api_key = os.getenv("OPENWEATHER_API_KEY")
 
     lat, lon = location
     url = (f"https://api.openweathermap.org/data/2.5/onecall?"
