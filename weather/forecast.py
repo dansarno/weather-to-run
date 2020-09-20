@@ -68,7 +68,7 @@ def plot_scores(day, rankings, to_show):
     fig.text(0.045, 0.9, "Weather to run or bot".upper(), color='white', fontsize=18, fontweight='bold')
 
     fig.text(0.05, 0.8, "LOCATION:", color=colours.info_field, fontsize=12)
-    fig.text(0.17, 0.8, "LONDON, UK", color=colours.info_text, fontsize=12)
+    fig.text(0.17, 0.8, f"{list(day.location.keys())[0].upper()}", color=colours.info_text, fontsize=12)
     fig.text(0.05, 0.75, "SUNRISE:", color=colours.info_field, fontsize=12)
     fig.text(0.17, 0.75, f"{day.sunrise:%H:%M}", color=colours.info_text, fontsize=12)
     fig.text(0.05, 0.7, "SUNSET:", color=colours.info_field, fontsize=12)
@@ -88,7 +88,7 @@ def plot_scores(day, rankings, to_show):
         rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor=colours.segments)
         ax.add_patch(rect)
 
-        ax.text(((seg.end_time.hour + seg.start_time.hour) / 2) - 0.2,
+        ax.text(((seg.end_time.hour + seg.start_time.hour) / 2) + 0.2,
                 1.7,
                 seg.name.upper(),
                 color='white',
