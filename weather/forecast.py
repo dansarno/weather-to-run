@@ -10,11 +10,11 @@ import matplotlib.image as mpimg
 from weather import dashboard_colours as colours
 
 
-def fetch_forecast(location=(51.5074, 0.1278)):
+def fetch_forecast(location):
 
     api_key = os.getenv("OPENWEATHER_API_KEY")
 
-    lat, lon = location
+    lat, lon = list(location.values())[0]
     url = (f"https://api.openweathermap.org/data/2.5/onecall?"
            f"lat={lat}&lon={lon}"
            f"&exclude=current"
@@ -56,7 +56,7 @@ def plot_scores(day, rankings, to_show):
 
     x_smooth = np.linspace(min(times), max(times), 200)
 
-    fig = plt.figure(figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
+    fig = plt.figure("Weather Dashboard", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.08, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
     fig.patch.set_facecolor(colours.background)

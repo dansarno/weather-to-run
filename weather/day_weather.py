@@ -46,12 +46,12 @@ class TimePeriod(TimeElement):
 class Day(TimePeriod):
     TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
 
-    def __init__(self, date=TOMORROW, segments=config.TIME_WINDOWS):
+    def __init__(self, date=TOMORROW, segments=config.TIME_WINDOWS, location=config.LOCATION):
         super().__init__()
         self.sunrise = 0
         self.sunset = 0
         self.date = date
-        self.location = config.LOCATION
+        self.location = location
         self.rankings = {"Green": [], "Amber": [], "Red": []}
         if date.isoweekday() in {6, 7}:  # i.e. is it the weekend?
             day_type = "weekend"
@@ -70,7 +70,7 @@ class Day(TimePeriod):
                f"({', '.join([name.title() for name, segment in self.segments.items()])}))"
 
     def add_forecast(self):
-        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(location=self.location["London"])
+        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(location=self.location)
         day_temps = []
         for hour_forecast in hourly_forecasts:
             is_this_day = self.date == datetime.datetime.fromtimestamp(hour_forecast["dt"]).date()

@@ -43,8 +43,18 @@ def daily_tweet(api_obj):
     api_obj.update_status(status=tweet_text, media_ids=[media.media_id])
 
 
-def tweet_your_weather():
-    pass
+def tweet_your_weather(location):
+    your_tomorrow = day_weather.Day(location=location)
+    your_tomorrow.score_forecast()
+    your_tomorrow.rank_segments()
+    choices, tone = rankings_interpreter(your_tomorrow.rankings)
+
+    fname = f"dashboards/test_dashboard_{your_tomorrow.date.strftime('%d-%m-%y')}.jpg"
+    produce_dashboard_image(your_tomorrow, choices, fname, to_show=True)
+
+    tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
+    tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
+    # TODO finish this function
 
 
 if __name__ == "__main__":
@@ -52,3 +62,6 @@ if __name__ == "__main__":
     # Create API object
     api = config.create_api()
     daily_tweet(api)
+
+    # test_loc = {"Tokyo": (35.6974, 139.7946)}
+    # tweet_your_weather(test_loc)

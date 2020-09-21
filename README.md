@@ -9,7 +9,7 @@ of the day is best to go out.
 The format of these tweets are: text status with the best time of the day for running along with a 
 "dashboard" image with additional information of the next day's weather.
 
-### Example Tweet
+#### Example Tweet
 
 Status Update:
 
@@ -18,8 +18,42 @@ Status Update:
 
 Media:
 
-![Example of a weather dashboard](dashboards/dashboard_22-09-20.jpg)
+![Example of a weather dashboard](readme_images/dashboard_22-09-20.jpg)
 
-## Day Weather Object
+## Automation
+The following is a description of the automated processes performed by the Twitter bot.
 
-## Tweet Generator
+### Daily Tweet
+Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled for at 8pm London time 
+and follow the format outlined above.
+
+### Auto-Reply
+_Not yet implemented_
+
+Automatically replies to Twitter users that @ mentions the account to discover what the bot thinks the best
+time to run in their location is. The replies must follow these formatting rules (outlined in the bot's bio):
+- Be an @ mention to the [@weather_to_run](https://twitter.com/weather_to_run) account
+- Use the hashtag #whataboutme
+- Contain their location information, either as...
+    - The english name and spelling of the nearest major city
+    - Or, latitude and logitude coordinates
+    
+An example reply and response by the Twitter bot would be:
+
+"Hello Tokyo! What a great day to be alive! You're in luck, good weather all round! What are you waiting for?!"
+
+![Example of a weather dashboard](readme_images/tokyo_dashboard_22-09-20.jpg)
+
+"@weather_to_run #whataboutme Paris"
+
+### Follow Back
+_Not yet implemented_
+
+
+## Behind the Scenes
+
+### Day Weather Object
+
+### Tweet Generator
+
+### Heroku Deployment
