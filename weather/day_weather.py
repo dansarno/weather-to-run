@@ -98,7 +98,7 @@ class Day(TimePeriod):
             self.wind_mps = day_forecast["wind_speed"]
             self.precipitation_type = str(int(day_forecast["weather"][0]["id"]))
             self.precipitation_prob = day_forecast["pop"]
-            if day_forecast["pop"] != 0:
+            if "rain" in day_forecast.keys():
                 self.precipitation_mm = day_forecast["rain"]
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
