@@ -116,10 +116,12 @@ def plot_scores(day, rankings, to_show):
     ax2 = fig.add_subplot(gs[0, -1])
     max_temp = 40  # C
     ccw = False
-    if day.temp_c > 0:
+    if 0 < day.temp_c <= max_temp:
         groups = [day.temp_c / max_temp, 1 - day.temp_c / max_temp]
     elif day.temp_c == 0:
         groups = [0.01, 0.99]
+    elif day.temp_c >= max_temp:
+        groups = [max_temp, 0]
     else:
         groups = [abs(day.temp_c) / max_temp, 1 - abs(day.temp_c) / max_temp]
         ccw = True
@@ -146,7 +148,12 @@ def plot_scores(day, rankings, to_show):
 
     ax3 = fig.add_subplot(gs[1, -1])
     max_wind = 30  # mps
-    groups = [day.wind_mps / max_wind, 1 - day.wind_mps / max_wind]
+    if 0 < day.wind_mps <= max_wind:
+        groups = [day.wind_mps / max_wind, 1 - day.wind_mps / max_wind]
+    elif day.wind_mps > max_wind:
+        groups = [max_wind, 0]
+    else:
+        groups = [0.01, 0.99]
     ax3.pie(groups, colors=[colours.wind, colours.segments], startangle=90, counterclock=False)
     my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
     ax3.add_artist(my_circle)
@@ -170,8 +177,10 @@ def plot_scores(day, rankings, to_show):
 
     ax4 = fig.add_subplot(gs[2, -1])
     max_precip = 20  # mm
-    if day.precipitation_mm != 0:
+    if 0 < day.precipitation_mm <= max_precip:
         groups = [day.precipitation_mm / max_precip, 1 - day.precipitation_mm / max_precip]
+    elif day.precipitation_mm > max_precip:
+        groups = [max_precip, 0]
     else:
         groups = [0.01, 0.99]
     ax4.pie(groups, colors=[colours.precip, colours.segments], startangle=90, counterclock=False)
