@@ -1,6 +1,3 @@
-# Local keys
-credentials.py
-
 # Python files
 *.pyc
 *.pckl
