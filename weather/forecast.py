@@ -23,10 +23,11 @@ def fetch_forecast(location):
 
     response = requests.get(url)
     full_response_dict = response.json()
+    timezone_offset = full_response_dict["timezone_offset"]
     hourly_forecast = full_response_dict["hourly"]
     daily_forecast = full_response_dict["daily"]
 
-    return hourly_forecast, daily_forecast
+    return hourly_forecast, daily_forecast, timezone_offset
 
 
 def wind_speed_to_score(wind_speed):
@@ -177,11 +178,11 @@ def plot_scores(day, rankings, to_show):
     my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
     ax4.add_artist(my_circle)
     ax4.text(1.3, 0.4, "M:", color=colours.info_field, fontsize=12)
-    ax4.text(1.8, 0.4, f"{day.segments['morning'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
+    ax4.text(1.8, 0.4, f"{day.segments['morning'].precipitation_mm:.1f}mm", color=colours.info_text, fontsize=12)
     ax4.text(1.3, -0.2, "A:", color=colours.info_field, fontsize=12)
-    ax4.text(1.8, -0.2, f"{day.segments['afternoon'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
+    ax4.text(1.8, -0.2, f"{day.segments['afternoon'].precipitation_mm:.1f}mm", color=colours.info_text, fontsize=12)
     ax4.text(1.3, -0.8, "E:", color=colours.info_field, fontsize=12)
-    ax4.text(1.8, -0.8, f"{day.segments['evening'].precipitation_mm:.0f}mm", color=colours.info_text, fontsize=12)
+    ax4.text(1.8, -0.8, f"{day.segments['evening'].precipitation_mm:.1f}mm", color=colours.info_text, fontsize=12)
     # ax4.text(-0.2, -0.2, "P", color='white', fontsize=17)
     ax_drop = fig.add_axes([0.747, 0.2, 0.08, 0.08])
     im_drop = mpimg.imread('assets/drop.png')

@@ -23,15 +23,22 @@ class TimePeriod(TimeElement):
         self.hours = []
         self.alert_level = ""
 
-    def average_score(self):
+    def aggregate_score(self, method="min"):
         if self.hours:
             all_temp_scores = [hour.temp_score for hour in self.hours]
             all_wind_scores = [hour.wind_score for hour in self.hours]
             all_precip_scores = [hour.precipitation_score for hour in self.hours]
 
-            self.temp_score = round(sum(all_temp_scores) / len(all_temp_scores), 2)
-            self.wind_score = round(sum(all_wind_scores) / len(all_wind_scores), 2)
-            self.precipitation_score = all_precip_scores[len(all_precip_scores) // 2]  # this may need changing!
+            if method.lower() == "min":
+                self.temp_score = round(min(all_temp_scores), 2)
+                self.wind_score = round(min(all_wind_scores), 2)
+                self.precipitation_score = round(min(all_precip_scores), 2)
+            elif method.lower() == "average":
+                self.temp_score = round(sum(all_temp_scores) / len(all_temp_scores), 2)
+                self.wind_score = round(sum(all_wind_scores) / len(all_wind_scores), 2)
+                self.precipitation_score = all_precip_scores[len(all_precip_scores) // 2]
+            else:
+                print(f'Aggregate score method "{method}" not recognised')  # Need to raise an error here instead
 
     def judge_score(self, bands=config.ALERT_BANDS):
         worst_alert_level = ""
@@ -70,13 +77,13 @@ class Day(TimePeriod):
                f"({', '.join([name.title() for name, segment in self.segments.items()])}))"
 
     def add_forecast(self):
-        hourly_forecasts, daily_forecasts = forecast.fetch_forecast(location=self.location)
+        hourly_forecasts, daily_forecasts, timezone_offset = forecast.fetch_forecast(location=self.location)
         day_temps = []
         for hour_forecast in hourly_forecasts:
-            is_this_day = self.date == datetime.datetime.fromtimestamp(hour_forecast["dt"]).date()
+            is_this_day = self.date == datetime.datetime.utcfromtimestamp(hour_forecast["dt"] + timezone_offset).date()
             if not is_this_day:
                 continue
-            this_hour = Hour(datetime.datetime.fromtimestamp(hour_forecast["dt"]).hour)
+            this_hour = Hour(datetime.datetime.utcfromtimestamp(hour_forecast["dt"] + timezone_offset).hour)
             this_hour.temp_c = hour_forecast["feels_like"]  # Using "feels like" temp makes sense for scoring
             this_hour.wind_mps = hour_forecast["wind_speed"]
             this_hour.precipitation_type = str(int(hour_forecast["weather"][0]["id"]))
@@ -89,11 +96,11 @@ class Day(TimePeriod):
         self._segment_forecast()
 
         for day_forecast in daily_forecasts:
-            is_this_day = self.date == datetime.datetime.fromtimestamp(day_forecast["dt"]).date()
+            is_this_day = self.date == datetime.datetime.utcfromtimestamp(day_forecast["dt"] + timezone_offset).date()
             if not is_this_day:
                 continue
-            self.sunrise = datetime.datetime.fromtimestamp(day_forecast["sunrise"]).time()
-            self.sunset = datetime.datetime.fromtimestamp(day_forecast["sunset"]).time()
+            self.sunrise = datetime.datetime.utcfromtimestamp(day_forecast["sunrise"] + timezone_offset).time()
+            self.sunset = datetime.datetime.utcfromtimestamp(day_forecast["sunset"] + timezone_offset).time()
             self.temp_c = round(sum(day_temps) / len(day_temps), 2)  # Using average daily temperature for now
             self.wind_mps = day_forecast["wind_speed"]
             self.precipitation_type = str(int(day_forecast["weather"][0]["id"]))
@@ -108,9 +115,10 @@ class Day(TimePeriod):
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
         for seg_name, segment in self.segments.items():
-            segment.average_score()
+            segment.aggregate_score(method="min")  # the worst weather in that given time period
 
-        self.average_score()
+        # self.average_score()  # average for the day determines the tone of the tweet
+        self.aggregate_score(method="min")  # not obvious if the alert level should judged off the worst or av score
         self.judge_score()
 
     def rank_segments(self, segments_to_rank=None):
@@ -146,7 +154,7 @@ class Day(TimePeriod):
 
         # Update segment attributes after segments have hours
         for seg_name, segment in self.segments.items():
-            segment.average_weather()
+            segment.aggregate_weather()
 
 
 class DaySegment(TimePeriod):
@@ -163,7 +171,7 @@ class DaySegment(TimePeriod):
     def __repr__(self):
         return f"{self.__class__.__name__}({self.name.title()}({self.start_time} - {self.end_time}))"
 
-    def average_weather(self):
+    def aggregate_weather(self):
         all_temp_c = [hour.temp_c for hour in self.hours]
         all_wind_mps = [hour.wind_mps for hour in self.hours]
         all_precip_types = [hour.precipitation_type for hour in self.hours]
@@ -174,7 +182,7 @@ class DaySegment(TimePeriod):
         self.wind_mps = round(sum(all_wind_mps) / len(all_wind_mps), 2)
         self.precipitation_type = all_precip_types[len(all_precip_types) // 2]  # this may need changing!
         self.precipitation_prob = round(sum(all_precip_probs) / len(all_precip_probs), 2)  # this may need changing!
-        self.precipitation_mm = round(sum(all_precip_mm) / len(all_precip_mm), 2)  # this may need changing!
+        self.precipitation_mm = round(sum(all_precip_mm), 2)  # this may need changing!
 
 
 class Hour(TimeElement):
