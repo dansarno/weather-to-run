@@ -40,11 +40,11 @@ time to run in their location is. The replies must follow these formatting rules
     
 An example reply and response by the Twitter bot would be:
 
-"Hello Tokyo! What a great day to be alive! You're in luck, good weather all round! What are you waiting for?!"
+Reply: "@weather_to_run #whataboutme Tokyo"
+
+Bot response: "Hello Tokyo! What a great day to be alive! You're in luck, good weather all round! What are you waiting for?!"
 
 ![Example of a weather dashboard](readme_images/tokyo_dashboard_22-09-20.jpg)
-
-"@weather_to_run #whataboutme Paris"
 
 ### Follow Back
 _Not yet implemented_
