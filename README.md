@@ -33,14 +33,14 @@ _Not yet implemented_
 Automatically replies to Twitter users that @ mentions the account to discover what the bot thinks the best
 time to run in their location is. The replies must follow these formatting rules (outlined in the bot's bio):
 - Be an @ mention to the [@weather_to_run](https://twitter.com/weather_to_run) account
-- Use the hashtag #whataboutme
+- Use the hashtag #whataboutus
 - Contain their location information, either as...
     - The english name and spelling of the nearest major city
     - Or, latitude and logitude coordinates
     
 An example reply and response by the Twitter bot would be:
 
-Reply: "@weather_to_run #whataboutme Houston"
+Reply: "@weather_to_run #whataboutus Houston"
 
 Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best guess... I say go for it"
 
