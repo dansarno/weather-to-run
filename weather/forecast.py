@@ -122,6 +122,16 @@ def plot_scores(day, rankings, to_show):
         groups = [0.01, 0.99]
     elif day.temp_c >= max_temp:
         groups = [max_temp, 0]
+        ax_max = fig.add_axes([0.77, 0.925, 0.04, 0.04])
+        im_max = mpimg.imread('assets/maxed_temp.png')
+        ax_max.imshow(im_max)
+        ax_max.xaxis.set_visible(False)
+        ax_max.yaxis.set_visible(False)
+        ax_max.set_facecolor(colours.background)
+        ax_max.spines['right'].set_visible(False)
+        ax_max.spines['left'].set_visible(False)
+        ax_max.spines['bottom'].set_visible(False)
+        ax_max.spines['top'].set_visible(False)
     else:
         groups = [abs(day.temp_c) / max_temp, 1 - abs(day.temp_c) / max_temp]
         ccw = True
@@ -152,6 +162,16 @@ def plot_scores(day, rankings, to_show):
         groups = [day.wind_mps / max_wind, 1 - day.wind_mps / max_wind]
     elif day.wind_mps > max_wind:
         groups = [max_wind, 0]
+        ax_max = fig.add_axes([0.77, 0.634, 0.04, 0.04])
+        im_max = mpimg.imread('assets/maxed_wind.png')
+        ax_max.imshow(im_max)
+        ax_max.xaxis.set_visible(False)
+        ax_max.yaxis.set_visible(False)
+        ax_max.set_facecolor(colours.background)
+        ax_max.spines['right'].set_visible(False)
+        ax_max.spines['left'].set_visible(False)
+        ax_max.spines['bottom'].set_visible(False)
+        ax_max.spines['top'].set_visible(False)
     else:
         groups = [0.01, 0.99]
     ax3.pie(groups, colors=[colours.wind, colours.segments], startangle=90, counterclock=False)
@@ -181,6 +201,16 @@ def plot_scores(day, rankings, to_show):
         groups = [day.precipitation_mm / max_precip, 1 - day.precipitation_mm / max_precip]
     elif day.precipitation_mm > max_precip:
         groups = [max_precip, 0]
+        ax_max = fig.add_axes([0.77, 0.34, 0.04, 0.04])
+        im_max = mpimg.imread('assets/maxed_precip.png')
+        ax_max.imshow(im_max)
+        ax_max.xaxis.set_visible(False)
+        ax_max.yaxis.set_visible(False)
+        ax_max.set_facecolor(colours.background)
+        ax_max.spines['right'].set_visible(False)
+        ax_max.spines['left'].set_visible(False)
+        ax_max.spines['bottom'].set_visible(False)
+        ax_max.spines['top'].set_visible(False)
     else:
         groups = [0.01, 0.99]
     ax4.pie(groups, colors=[colours.precip, colours.segments], startangle=90, counterclock=False)
