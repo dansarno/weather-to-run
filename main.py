@@ -65,7 +65,7 @@ if __name__ == "__main__":
     api = config.create_api()
     # daily_tweet(api, debug=False)
     schedule.every(10).seconds.do(print, "Running...")
-    schedule.every(1).minutes.do(daily_tweet, api)
+    schedule.every(10).minutes.do(daily_tweet, api)
 
     while True:
         schedule.run_pending()
