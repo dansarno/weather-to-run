@@ -63,9 +63,9 @@ def tweet_your_weather(location):
 if __name__ == "__main__":
 
     # Create API object
-    # api = config.create_api()
-    # daily_tweet(api)
+    api = config.create_api()
+    daily_tweet(api)
 
-    test_loc = {"Houston": (29.760427, -95.369804)}
-    # test_loc = {"Tokyo": (35.689487, 139.691711)}
-    tweet_your_weather(test_loc)
+    # test_loc = {"Houston": (29.760427, -95.369804)}
+    # # test_loc = {"Tokyo": (35.689487, 139.691711)}
+    # tweet_your_weather(test_loc)

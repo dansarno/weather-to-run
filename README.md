@@ -13,12 +13,11 @@ The format of these tweets are: text status with the best time of the day for ru
 
 Status Update:
 
-"Hello, world! All good options but in first place is afternoon, followed by morning and then evening 
-(but honestly its up to you). Easy one that"
+"I got morning, afternoon and evening. In that order."
 
 Media:
 
-![Example of a weather dashboard](readme_images/dashboard_22-09-20.jpg)
+![Example of a weather dashboard](readme_images/dashboard_23-09-20.jpg)
 
 ## Automation
 The following is a description of the automated processes performed by the Twitter bot.
