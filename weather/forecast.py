@@ -4,6 +4,7 @@ import requests
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from scipy.interpolate import interp1d
 import scipy.ndimage
 import matplotlib.image as mpimg
@@ -42,7 +43,7 @@ def temp_c_to_score(temp_c):
     return round(min(max(score, 0), 9), 1)
 
 
-def plot_scores(day, rankings, to_show):
+def plot_scores(day, rankings, to_show, filename):
 
     # TODO: This plotting protocol needs porting over to main where it can be integrated with true weather data
     # TODO: Also need to sort out how to gradient the segment patches so they fade out towards the top
@@ -144,17 +145,11 @@ def plot_scores(day, rankings, to_show):
     ax2.text(1.8, -0.2, f"{day.segments['afternoon'].temp_c:.1f}°C", color=colours.info_text, fontsize=12)
     ax2.text(1.3, -0.8, "E:", color=colours.info_field, fontsize=12)
     ax2.text(1.8, -0.8, f"{day.segments['evening'].temp_c:.1f}°C", color=colours.info_text, fontsize=12)
-    # ax2.text(-0.2, -0.2, "T", color='white', fontsize=17)
-    ax_therm = fig.add_axes([0.748, 0.786, 0.08, 0.08])
+
     im_therm = mpimg.imread('assets/therm.png')
-    ax_therm.imshow(im_therm)
-    ax_therm.xaxis.set_visible(False)
-    ax_therm.yaxis.set_visible(False)
-    ax_therm.set_facecolor(colours.background)
-    ax_therm.spines['right'].set_visible(False)
-    ax_therm.spines['left'].set_visible(False)
-    ax_therm.spines['bottom'].set_visible(False)
-    ax_therm.spines['top'].set_visible(False)
+    therm = OffsetImage(im_therm, zoom=0.18)
+    ab_therm = AnnotationBbox(therm, (0, 0), frameon=False)
+    ax2.add_artist(ab_therm)
 
     ax3 = fig.add_subplot(gs[1, -1])
     max_wind = 30  # mps
@@ -183,17 +178,11 @@ def plot_scores(day, rankings, to_show):
     ax3.text(1.8, -0.2, f"{day.segments['afternoon'].wind_mps:.1f}m/s", color=colours.info_text, fontsize=12)
     ax3.text(1.3, -0.8, "E:", color=colours.info_field, fontsize=12)
     ax3.text(1.8, -0.8, f"{day.segments['evening'].wind_mps:.1f}m/s", color=colours.info_text, fontsize=12)
-    # ax3.text(-0.2, -0.2, "W", color='white', fontsize=17)
-    ax_wind = fig.add_axes([0.747, 0.495, 0.08, 0.08])
+
     im_wind = mpimg.imread('assets/wind.png')
-    ax_wind.imshow(im_wind)
-    ax_wind.xaxis.set_visible(False)
-    ax_wind.yaxis.set_visible(False)
-    ax_wind.set_facecolor(colours.background)
-    ax_wind.spines['right'].set_visible(False)
-    ax_wind.spines['left'].set_visible(False)
-    ax_wind.spines['bottom'].set_visible(False)
-    ax_wind.spines['top'].set_visible(False)
+    wind = OffsetImage(im_wind, zoom=0.18)
+    ab_wind = AnnotationBbox(wind, (0, 0), frameon=False)
+    ax3.add_artist(ab_wind)
 
     ax4 = fig.add_subplot(gs[2, -1])
     max_precip = 20  # mm
@@ -222,33 +211,22 @@ def plot_scores(day, rankings, to_show):
     ax4.text(1.8, -0.2, f"{day.segments['afternoon'].precipitation_mm:.1f}mm", color=colours.info_text, fontsize=12)
     ax4.text(1.3, -0.8, "E:", color=colours.info_field, fontsize=12)
     ax4.text(1.8, -0.8, f"{day.segments['evening'].precipitation_mm:.1f}mm", color=colours.info_text, fontsize=12)
-    # ax4.text(-0.2, -0.2, "P", color='white', fontsize=17)
-    ax_drop = fig.add_axes([0.747, 0.2, 0.08, 0.08])
-    im_drop = mpimg.imread('assets/drop.png')
-    ax_drop.imshow(im_drop)
-    ax_drop.xaxis.set_visible(False)
-    ax_drop.yaxis.set_visible(False)
-    ax_drop.set_facecolor(colours.background)
-    ax_drop.spines['right'].set_visible(False)
-    ax_drop.spines['left'].set_visible(False)
-    ax_drop.spines['bottom'].set_visible(False)
-    ax_drop.spines['top'].set_visible(False)
 
-    ax5 = fig.add_axes([0.59, 0.12, 0.19, 0.19])
-    im = mpimg.imread('assets/my_bot.png')
-    ax5.imshow(im)
-    ax5.xaxis.set_visible(False)
-    ax5.yaxis.set_visible(False)
-    ax5.set_facecolor(colours.background)
-    ax5.spines['right'].set_visible(False)
-    ax5.spines['left'].set_visible(False)
-    ax5.spines['bottom'].set_visible(False)
-    ax5.spines['top'].set_visible(False)
+    im_drop = mpimg.imread('assets/drop.png')
+    drop = OffsetImage(im_drop, zoom=0.17)
+    ab_drop = AnnotationBbox(drop, (0, 0), frameon=False)
+    ax4.add_artist(ab_drop)
+
+    # im_bot = mpimg.imread('assets/my_bot.png')
+    # bot = OffsetImage(im_bot, zoom=0.1)
+    # ab_bot = AnnotationBbox(bot, (-1.25, -0.28), frameon=False)
+    # ax4.add_artist(ab_bot)
 
     if to_show:
         plt.show()
 
-    return fig
+    if filename:
+        fig.savefig(filename)
 
 
 if __name__ == "__main__":
