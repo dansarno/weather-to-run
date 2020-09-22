@@ -19,7 +19,7 @@ def _add_selections_to_tweet(tweet_text, selections):
 
 def get_tweet_templates(yaml_filename="tweet_content.yaml"):
     with open(yaml_filename, 'r', encoding="utf8") as f:
-        templates_dict = yaml.load(f)
+        templates_dict = yaml.load(f, Loader=yaml.FullLoader)
     return templates_dict
 
 
