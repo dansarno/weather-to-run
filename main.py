@@ -49,7 +49,7 @@ def daily_tweet(api_obj, debug=False):
     print("Tweeted!")
 
 
-def check_mentions(api_obj, keywords):
+def reply_to_mentions(api_obj):
     logger.info("Retrieving mentions")
     global since_id
     new_since_id = since_id
@@ -57,14 +57,11 @@ def check_mentions(api_obj, keywords):
         new_since_id = max(tweet.id, new_since_id)
         if tweet.in_reply_to_status_id is not None:
             continue
-        if any(keyword in tweet.text.lower() for keyword in keywords):
+        if "whataboutus" in tweet.text.lower():
             logger.info(f"Answering to {tweet.user.name}")
 
-            if not tweet.user.following:
-                tweet.user.follow()
-
             api_obj.update_status(
-                status=f"@{tweet.author.screen_name}, please reach us via DM",
+                status=f"@{tweet.author.screen_name} hi there!",
                 in_reply_to_status_id=tweet.id,
                 auto_populate_reply_metadata=True
             )
@@ -95,7 +92,7 @@ if __name__ == "__main__":
     api = config.create_api()
     # daily_tweet(api, debug=True)
     schedule.every(10).seconds.do(print, "Running...")
-    schedule.every(10).seconds.do(check_mentions, api, ["help", "support"])
+    schedule.every(10).seconds.do(reply_to_mentions, api)
     # schedule.every(10).minutes.do(daily_tweet, api)
 
     while True:
