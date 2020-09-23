@@ -95,8 +95,8 @@ if __name__ == "__main__":
     # Create API object
     api = config.create_api()
     # daily_tweet(api, debug=True)
-    schedule.every(10).seconds.do(print, "Running...")
-    schedule.every(10).seconds.do(reply_to_mentions, api)
+    schedule.every(15).seconds.do(reply_to_mentions, api)
+    schedule.every().day.at("11:15").do(daily_tweet, api)
     # schedule.every(10).minutes.do(daily_tweet, api)
 
     while True:
