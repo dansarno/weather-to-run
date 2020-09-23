@@ -1,9 +1,15 @@
 import time
+import logging
 import schedule
+import tweepy
 from weather import day_weather
 from weather import forecast
 from bots import tweet_composer
 from bots import config
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 
 def rankings_interpreter(rankings):
@@ -43,6 +49,29 @@ def daily_tweet(api_obj, debug=False):
     print("Tweeted!")
 
 
+def check_mentions(api_obj, keywords):
+    logger.info("Retrieving mentions")
+    global since_id
+    new_since_id = since_id
+    for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
+        new_since_id = max(tweet.id, new_since_id)
+        if tweet.in_reply_to_status_id is not None:
+            continue
+        if any(keyword in tweet.text.lower() for keyword in keywords):
+            logger.info(f"Answering to {tweet.user.name}")
+
+            if not tweet.user.following:
+                tweet.user.follow()
+
+            api_obj.update_status(
+                status=f"@{tweet.author.screen_name}, please reach us via DM",
+                in_reply_to_status_id=tweet.id,
+                auto_populate_reply_metadata=True
+            )
+    since_id = new_since_id
+    print(since_id)
+
+
 def tweet_your_weather(location):
     your_tomorrow = day_weather.Day(location=location)
     your_tomorrow.score_forecast()
@@ -61,15 +90,16 @@ def tweet_your_weather(location):
 
 if __name__ == "__main__":
 
+    since_id = 1
     # Create API object
     api = config.create_api()
-    # daily_tweet(api, debug=False)
+    # daily_tweet(api, debug=True)
     schedule.every(10).seconds.do(print, "Running...")
-    schedule.every(10).minutes.do(daily_tweet, api)
+    schedule.every(10).seconds.do(check_mentions, api, ["help", "support"])
+    # schedule.every(10).minutes.do(daily_tweet, api)
 
     while True:
         schedule.run_pending()
-        time.sleep(1)
 
     # test_loc = {"Houston": (29.760427, -95.369804)}
     # # test_loc = {"Tokyo": (35.689487, 139.691711)}
