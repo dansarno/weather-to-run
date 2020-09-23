@@ -48,10 +48,14 @@ Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best 
 ### Follow Back
 _Not yet implemented_
 
+Automatically follows anyone who follows the [@weather_to_run](https://twitter.com/weather_to_run) account.
 
 ## Behind the Scenes
 
 ### Day Weather Object
+
+Encapsulation of OpenWeatherMap's One Call API response, adding a model layer and other convenient functionality 
+on top of it.
 
 ### Tweet Generator
 
