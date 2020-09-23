@@ -51,13 +51,16 @@ def daily_tweet(api_obj, debug=False):
 
 def reply_to_mentions(api_obj):
     logger.info("Retrieving mentions")
-    global since_id
+
+    with open("last_since_id.txt", 'r') as f:
+        since_id = int(f.read())
+
     new_since_id = since_id
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
         new_since_id = max(tweet.id, new_since_id)
         if tweet.in_reply_to_status_id is not None:
             continue
-        if "whataboutus" in tweet.text.lower():
+        if any("whataboutus" == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
             logger.info(f"Answering to {tweet.user.name}")
 
             api_obj.update_status(
@@ -66,7 +69,9 @@ def reply_to_mentions(api_obj):
                 auto_populate_reply_metadata=True
             )
     since_id = new_since_id
-    print(since_id)
+
+    with open("last_since_id.txt", 'w') as f:
+        f.write(str(since_id))
 
 
 def tweet_your_weather(location):
@@ -87,7 +92,6 @@ def tweet_your_weather(location):
 
 if __name__ == "__main__":
 
-    since_id = 1
     # Create API object
     api = config.create_api()
     # daily_tweet(api, debug=True)
