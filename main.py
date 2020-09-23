@@ -96,7 +96,7 @@ if __name__ == "__main__":
     api = config.create_api()
     # daily_tweet(api, debug=True)
     schedule.every(15).seconds.do(reply_to_mentions, api)
-    schedule.every().day.at("23:18").do(daily_tweet, api)
+    schedule.every().day.at("23:25").do(daily_tweet, api)
     # schedule.every(10).minutes.do(daily_tweet, api)
 
     while True:
