@@ -7,9 +7,17 @@ from weather import forecast
 from bots import tweet_composer
 from bots import config
 
+logging.getLogger('schedule').propagate = False
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+
+logger.addHandler(stream_handler)
 
 
 def rankings_interpreter(rankings):
