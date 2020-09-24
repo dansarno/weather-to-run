@@ -8,7 +8,7 @@ from bots import tweet_composer
 from bots import config
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
 logger = logging.getLogger()
 
 
@@ -46,7 +46,7 @@ def daily_tweet(api_obj, debug=False):
         # Create a test tweet
         api_obj.update_status(status=tweet_text, media_ids=[media.media_id])
 
-    print("Tweeted!")
+    logger.info("Daily tweet posted")
 
 
 def reply_to_mentions(api_obj):
@@ -61,7 +61,7 @@ def reply_to_mentions(api_obj):
         if tweet.in_reply_to_status_id is not None:
             continue
         if any("whataboutus" == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
-            logger.info(f"Answering to {tweet.user.name}")
+            logger.info(f"Answering {tweet.user.name}")
 
             api_obj.update_status(
                 status=f"@{tweet.author.screen_name} hi there!",
