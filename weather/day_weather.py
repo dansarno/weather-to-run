@@ -8,6 +8,7 @@ is_Local = True
 class TimeElement:
     def __init__(self):
         self.temp_c = 0
+        self.feels_like = 0
         self.temp_score = 0
         self.wind_mps = 0
         self.wind_score = 0
@@ -79,19 +80,22 @@ class Day(TimePeriod):
     def add_forecast(self):
         hourly_forecasts, daily_forecasts, timezone_offset = forecast.fetch_forecast(location=self.location)
         day_temps = []
+        day_feels = []
         for hour_forecast in hourly_forecasts:
             is_this_day = self.date == datetime.datetime.utcfromtimestamp(hour_forecast["dt"] + timezone_offset).date()
             if not is_this_day:
                 continue
             this_hour = Hour(datetime.datetime.utcfromtimestamp(hour_forecast["dt"] + timezone_offset).hour)
-            this_hour.temp_c = hour_forecast["feels_like"]  # Using "feels like" temp makes sense for scoring
+            this_hour.temp_c = hour_forecast["temp"]
+            this_hour.feels_like = hour_forecast["feels_like"]  # Using "feels like" temp makes sense for scoring
             this_hour.wind_mps = hour_forecast["wind_speed"]
             this_hour.precipitation_type = str(int(hour_forecast["weather"][0]["id"]))
             this_hour.precipitation_prob = hour_forecast["pop"]
             if "rain" in hour_forecast.keys():
                 this_hour.precipitation_mm = hour_forecast["rain"]["1h"]
             self.hours.append(this_hour)  # add this hour to the day's hours list
-            day_temps.append(hour_forecast["feels_like"])
+            day_temps.append(hour_forecast["temp"])
+            day_feels.append(hour_forecast["feels_like"])
 
         self._segment_forecast()
 
@@ -102,6 +106,7 @@ class Day(TimePeriod):
             self.sunrise = datetime.datetime.utcfromtimestamp(day_forecast["sunrise"] + timezone_offset).time()
             self.sunset = datetime.datetime.utcfromtimestamp(day_forecast["sunset"] + timezone_offset).time()
             self.temp_c = round(sum(day_temps) / len(day_temps), 2)  # Using average daily temperature for now
+            self.feels_like = round(sum(day_feels) / len(day_feels), 2)  # Using average daily temperature for now
             self.wind_mps = day_forecast["wind_speed"]
             self.precipitation_type = str(int(day_forecast["weather"][0]["id"]))
             self.precipitation_prob = day_forecast["pop"]
@@ -110,7 +115,7 @@ class Day(TimePeriod):
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
         for hour in self.hours:
-            hour.temp_score = forecast.temp_c_to_score(hour.temp_c)
+            hour.temp_score = forecast.temp_c_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
             hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
@@ -173,12 +178,14 @@ class DaySegment(TimePeriod):
 
     def aggregate_weather(self):
         all_temp_c = [hour.temp_c for hour in self.hours]
+        all_feels_like = [hour.feels_like for hour in self.hours]
         all_wind_mps = [hour.wind_mps for hour in self.hours]
         all_precip_types = [hour.precipitation_type for hour in self.hours]
         all_precip_probs = [hour.precipitation_prob for hour in self.hours]
         all_precip_mm = [hour.precipitation_mm for hour in self.hours]
 
         self.temp_c = round(sum(all_temp_c) / len(all_temp_c), 2)
+        self.feels_like = round(sum(all_feels_like) / len(all_feels_like), 2)
         self.wind_mps = round(sum(all_wind_mps) / len(all_wind_mps), 2)
         self.precipitation_type = all_precip_types[len(all_precip_types) // 2]  # this may need changing!
         self.precipitation_prob = round(sum(all_precip_probs) / len(all_precip_probs), 2)  # this may need changing!

@@ -227,7 +227,3 @@ def plot_scores(day, rankings, to_show, filename):
 
     if filename:
         fig.savefig(filename)
-
-
-if __name__ == "__main__":
-    pass
