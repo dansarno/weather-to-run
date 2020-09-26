@@ -79,17 +79,26 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
             logger.info(f"Answering {tweet.user.name}")
 
             loc = auto_reply_bot.text_to_coords(tweet.text)
-            reply_text, dashboard_file = tweet_your_weather(loc)
+            if loc:
+                reply_text, dashboard_file = tweet_your_weather(loc)
 
-            # Upload media
-            media = api_obj.media_upload(dashboard_file)
+                # Upload media
+                media = api_obj.media_upload(dashboard_file)
 
-            api_obj.update_status(
-                status=f"@{tweet.author.screen_name} {reply_text}",
-                in_reply_to_status_id=tweet.id,
-                auto_populate_reply_metadata=True,
-                media_ids=[media.media_id]
-            )
+                api_obj.update_status(
+                    status=f"@{tweet.author.screen_name} {reply_text}",
+                    in_reply_to_status_id=tweet.id,
+                    auto_populate_reply_metadata=True,
+                    media_ids=[media.media_id]
+                )
+            else:
+                reply_text = "sorry, I couldn't find your location. Want to give it another try?"
+
+                api_obj.update_status(
+                    status=f"@{tweet.author.screen_name} {reply_text}",
+                    in_reply_to_status_id=tweet.id,
+                    auto_populate_reply_metadata=True
+                )
 
     # Set the last mention tweet id
     with open("bots/last_checked_tweet_id.txt", "w") as f:
@@ -103,7 +112,8 @@ def tweet_your_weather(location):
     choices, order = rankings_interpreter(your_tomorrow.rankings)
     tone = your_tomorrow.alert_level
 
-    fname = f"dashboards/replies/{list(location.keys())[0].lower()}_dashboard" \
+    dashboard_filename_prefix = "_".join(list(location.keys())[0].lower().split())
+    fname = f"dashboards/replies/{dashboard_filename_prefix}_dashboard" \
             f"_{your_tomorrow.date.strftime('%d-%m-%y')}.jpg"
     forecast.plot_scores(your_tomorrow, order, to_show=False, filename=fname)
 

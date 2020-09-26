@@ -222,8 +222,10 @@ def plot_scores(day, rankings, to_show, filename):
     # ab_bot = AnnotationBbox(bot, (-1.25, -0.28), frameon=False)
     # ax4.add_artist(ab_bot)
 
-    if to_show:
-        plt.show()
-
     if filename:
         fig.savefig(filename)
+
+    if to_show:
+        plt.show()
+    else:
+        plt.close()
