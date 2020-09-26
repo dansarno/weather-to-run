@@ -63,7 +63,7 @@ def reply_to_mentions(api_obj):
 
     # Get the last mention tweet id that we looked up
     with open("bots/last_checked_tweet_id.txt", "r") as f:
-        since_id = f.read()
+        since_id = int(f.read())
 
     new_since_id = since_id
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
@@ -81,7 +81,7 @@ def reply_to_mentions(api_obj):
 
     # Set the last mention tweet id
     with open("bots/last_checked_tweet_id.txt", "w") as f:
-        f.write(new_since_id)
+        f.write(str(new_since_id))
 
 
 def tweet_your_weather(location):
