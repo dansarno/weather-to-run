@@ -1,4 +1,5 @@
 import time
+import os
 import logging
 import schedule
 import tweepy
@@ -58,10 +59,11 @@ def daily_tweet(api_obj, debug=False):
 
 
 def reply_to_mentions(api_obj):
-    logger.info("Retrieving mentions")
+    logger.info("Retrieving mentions...")
 
-    # Get the latest mention tweet id
-    since_id = list(tweepy.Cursor(api_obj.mentions_timeline).items(1))[0].id
+    # Get the last mention tweet id that we looked up from environment variable
+    since_id = int(os.getenv("LAST_MENTION_ID"))
+
     new_since_id = since_id
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
         new_since_id = max(tweet.id, new_since_id)
@@ -75,6 +77,9 @@ def reply_to_mentions(api_obj):
                 in_reply_to_status_id=tweet.id,
                 auto_populate_reply_metadata=True
             )
+
+    # Set the last mention tweet id
+    os.environ["LAST_MENTION_ID"] = str(new_since_id)
 
 
 def tweet_your_weather(location):
