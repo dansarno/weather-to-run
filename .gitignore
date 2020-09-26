@@ -9,3 +9,4 @@ venv/*
 # Other
 .idea
 *.svg
+last_since_id.txt
