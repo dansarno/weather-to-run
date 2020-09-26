@@ -60,6 +60,7 @@ def daily_tweet(api_obj, debug=False):
 def reply_to_mentions(api_obj):
     logger.info("Retrieving mentions")
 
+    # Get the latest mention tweet id
     since_id = list(tweepy.Cursor(api_obj.mentions_timeline).items(1))[0].id
     new_since_id = since_id
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
@@ -96,12 +97,12 @@ if __name__ == "__main__":
 
     # Create API object
     api = config.create_api()
-    daily_tweet(api, debug=True)
-    # schedule.every(15).seconds.do(reply_to_mentions, api)
-    # schedule.every().day.at("22:00").do(daily_tweet, api)
+    # daily_tweet(api, debug=True)
+    schedule.every(15).seconds.do(reply_to_mentions, api)
+    schedule.every().day.at("22:00").do(daily_tweet, api)
 
-    # while True:
-    #     schedule.run_pending()
+    while True:
+        schedule.run_pending()
 
     # test_loc = {"Houston": (29.760427, -95.369804)}
     # # test_loc = {"Tokyo": (35.689487, 139.691711)}
