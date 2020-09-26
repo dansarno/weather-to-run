@@ -60,9 +60,7 @@ def daily_tweet(api_obj, debug=False):
 def reply_to_mentions(api_obj):
     logger.info("Retrieving mentions")
 
-    with open("bots/last_since_id.txt", 'r') as f:
-        since_id = int(f.read())
-
+    since_id = list(tweepy.Cursor(api_obj.mentions_timeline).items(1))[0].id
     new_since_id = since_id
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
         new_since_id = max(tweet.id, new_since_id)
@@ -76,10 +74,6 @@ def reply_to_mentions(api_obj):
                 in_reply_to_status_id=tweet.id,
                 auto_populate_reply_metadata=True
             )
-    since_id = new_since_id
-
-    with open("bots/last_since_id.txt", 'w') as f:
-        f.write(str(since_id))
 
 
 def tweet_your_weather(location):
@@ -102,12 +96,12 @@ if __name__ == "__main__":
 
     # Create API object
     api = config.create_api()
-    # daily_tweet(api, debug=True)
-    schedule.every(15).seconds.do(reply_to_mentions, api)
-    schedule.every().day.at("22:00").do(daily_tweet, api)
+    daily_tweet(api, debug=True)
+    # schedule.every(15).seconds.do(reply_to_mentions, api)
+    # schedule.every().day.at("22:00").do(daily_tweet, api)
 
-    while True:
-        schedule.run_pending()
+    # while True:
+    #     schedule.run_pending()
 
     # test_loc = {"Houston": (29.760427, -95.369804)}
     # # test_loc = {"Tokyo": (35.689487, 139.691711)}

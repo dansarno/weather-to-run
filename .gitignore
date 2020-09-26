@@ -9,4 +9,3 @@ venv/*
 # Other
 .idea
 *.svg
-#*since_id.txt
