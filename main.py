@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # Create API object
     api = config.create_api()
     # daily_tweet(api, debug=True)
-    # schedule.every(15).seconds.do(reply_to_mentions, api)
+    schedule.every(15).seconds.do(reply_to_mentions, api)
     schedule.every().day.at("22:00").do(daily_tweet, api)
 
     while True:
