@@ -7,6 +7,7 @@ from weather import day_weather
 from weather import forecast
 from bots import tweet_composer
 from bots import config
+from bots import auto_reply_bot
 
 logging.getLogger('schedule').propagate = False
 
@@ -77,10 +78,17 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
         if any(hashtag_str == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
             logger.info(f"Answering {tweet.user.name}")
 
+            loc = auto_reply_bot.text_to_coords(tweet.text)
+            reply_text, dashboard_file = tweet_your_weather(loc)
+
+            # Upload media
+            media = api_obj.media_upload(dashboard_file)
+
             api_obj.update_status(
-                status=f"@{tweet.author.screen_name} hi there!",
+                status=f"@{tweet.author.screen_name} {reply_text}",
                 in_reply_to_status_id=tweet.id,
-                auto_populate_reply_metadata=True
+                auto_populate_reply_metadata=True,
+                media_ids=[media.media_id]
             )
 
     # Set the last mention tweet id
@@ -95,13 +103,14 @@ def tweet_your_weather(location):
     choices, order = rankings_interpreter(your_tomorrow.rankings)
     tone = your_tomorrow.alert_level
 
-    fname = f"dashboards/test_dashboard_{your_tomorrow.date.strftime('%d-%m-%y')}.jpg"
+    fname = f"dashboards/replies/{list(location.keys())[0].lower()}_dashboard" \
+            f"_{your_tomorrow.date.strftime('%d-%m-%y')}.jpg"
     forecast.plot_scores(your_tomorrow, order, to_show=False, filename=fname)
 
     tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
     tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
-    print(tweet_text)
-    # TODO finish this function
+
+    return tweet_text, fname
 
 
 if __name__ == "__main__":
@@ -114,11 +123,11 @@ if __name__ == "__main__":
     last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
 
     # daily_tweet(api, debug=True)
-    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
-    schedule.every().day.at("22:00").do(daily_tweet, api)
+    # schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
+    # schedule.every().day.at("22:00").do(daily_tweet, api)
 
-    while True:
-        schedule.run_pending()
+    # while True:
+    #     schedule.run_pending()
 
     # test_loc = {"Houston": (29.760427, -95.369804)}
     # # test_loc = {"Tokyo": (35.689487, 139.691711)}
