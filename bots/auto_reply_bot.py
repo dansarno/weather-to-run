@@ -11,9 +11,9 @@ def create_geocoder_obj():
 def text_to_coords(tweet_text):
     geo = create_geocoder_obj()
 
-    cities = GeoText(tweet_text).cities
-    if cities:
-        city_str = GeoText(tweet_text).cities[0]
+    city_list = GeoText(tweet_text).cities
+    if city_list:
+        city_str = city_list[0]
         result = geo.geocode(city_str, no_annotations=1)
         return {city_str: (result[0]["geometry"]["lat"], result[0]["geometry"]["lng"])}
     else:
