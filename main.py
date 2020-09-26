@@ -58,19 +58,23 @@ def daily_tweet(api_obj, debug=False):
         logger.info("Daily tweet posted")
 
 
-def reply_to_mentions(api_obj):
+def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
     logger.info("Retrieving mentions...")
 
-    # Get the last mention tweet id that we looked up
+    # Get the last tweet id that is stored
     with open("bots/last_checked_tweet_id.txt", "r") as f:
-        since_id = int(f.read())
+        since_id_from_file = int(f.read())
 
-    new_since_id = since_id
-    for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=since_id).items():
+    # Use whichever is newest: from file or from initial check
+    new_since_id = max(since_id_from_file, initial_since_id)
+
+    for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=new_since_id).items():
+        # Update new_since_id if newer tweets are in the mentions timeline
         new_since_id = max(tweet.id, new_since_id)
         if tweet.in_reply_to_status_id is not None:
             continue
-        if any("whataboutus" == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
+
+        if any(hashtag_str == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
             logger.info(f"Answering {tweet.user.name}")
 
             api_obj.update_status(
@@ -102,10 +106,15 @@ def tweet_your_weather(location):
 
 if __name__ == "__main__":
 
+    tag = "myweather"
+
     # Create API object
     api = config.create_api()
+    # Get latest mention tweet_id
+    last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
+
     # daily_tweet(api, debug=True)
-    schedule.every(15).seconds.do(reply_to_mentions, api)
+    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
     schedule.every().day.at("22:00").do(daily_tweet, api)
 
     while True:

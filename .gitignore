@@ -9,4 +9,3 @@ venv/*
 # Other
 .idea
 *.svg
-bots/last_checked_tweet_id.txt
