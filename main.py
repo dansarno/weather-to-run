@@ -60,7 +60,7 @@ def daily_tweet(api_obj, debug=False):
 def reply_to_mentions(api_obj):
     logger.info("Retrieving mentions")
 
-    with open("last_since_id.txt", 'r') as f:
+    with open("bots/last_since_id.txt", 'r') as f:
         since_id = int(f.read())
 
     new_since_id = since_id
@@ -78,7 +78,7 @@ def reply_to_mentions(api_obj):
             )
     since_id = new_since_id
 
-    with open("last_since_id.txt", 'w') as f:
+    with open("bots/last_since_id.txt", 'w') as f:
         f.write(str(since_id))
 
 
