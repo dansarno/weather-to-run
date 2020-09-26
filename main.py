@@ -123,11 +123,11 @@ if __name__ == "__main__":
     last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
 
     # daily_tweet(api, debug=True)
-    # schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
-    # schedule.every().day.at("22:00").do(daily_tweet, api)
+    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
+    schedule.every().day.at("22:00").do(daily_tweet, api)
 
-    # while True:
-    #     schedule.run_pending()
+    while True:
+        schedule.run_pending()
 
     # test_loc = {"Houston": (29.760427, -95.369804)}
     # # test_loc = {"Tokyo": (35.689487, 139.691711)}
