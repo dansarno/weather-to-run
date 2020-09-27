@@ -27,23 +27,22 @@ Tweets when it thinks the best time to run is tomorrow. These tweets are schedul
 and follow the format outlined above.
 
 ### Auto-Reply
-_Not yet implemented_
 
 Automatically replies to Twitter users that @ mentions the account to discover what the bot thinks the best
 time to run in their location is. The replies must follow these formatting rules (outlined in the bot's bio):
 - Be an @ mention to the [@weather_to_run](https://twitter.com/weather_to_run) account
-- Use the hashtag #whataboutus
+- Use the hashtag #myweather
 - Contain their location information, either as...
     - The english name and spelling of the nearest major city
-    - Or, latitude and logitude coordinates
+    - Or, latitude and logitude coordinates (_not yet implemented_)
     
 An example reply and response by the Twitter bot would be:
 
-Reply: "@weather_to_run #whataboutus Houston"
+Reply: "@weather_to_run #myweather Houston"
 
 Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best guess... I say go for it"
 
-![Example of a weather dashboard](readme_images/houston_dashboard_22-09-20.jpg)
+![Examples of auto-reply dashboard](readme_images/auto_reply_demo.gif)
 
 ### Follow Back
 _Not yet implemented_
