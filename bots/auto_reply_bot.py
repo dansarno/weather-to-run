@@ -8,7 +8,7 @@ def create_geocoder_obj():
     return OpenCageGeocode(geocoder_api_key)
 
 
-def text_to_coords(tweet_text):
+def text_to_location(tweet_text):
     geo = create_geocoder_obj()
 
     city_list = GeoText(tweet_text).cities
@@ -23,5 +23,5 @@ def text_to_coords(tweet_text):
 if __name__ == "__main__":
 
     test_str = "fgdjk jkfgdjdh jfsklj fsfs Cork"
-    ans = text_to_coords(test_str)
+    ans = text_to_location(test_str)
     print(ans)
