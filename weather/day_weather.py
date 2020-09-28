@@ -34,7 +34,7 @@ class TimeElement:
 
 
 class TimePeriod(TimeElement):
-    """A class representing any length of time (segment, day) consisting of more a number of hours.
+    """A class representing any generic length of time (segment, day) consisting of a number of hours.
 
     Attributes:
         hours (list): A list of the Hour objects belonging to the TimePeriod
@@ -178,13 +178,16 @@ class Day(TimePeriod):
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
         """Maps weather conditions to scores for every hour in the day and aggregates scores over time periods.
 
-                
+        Mapping for temperature and wind speed to scores are continuous functions whereas the precipitation score is
+        a discrete mapping from weather condition ids to scores using precip_scores_dict. Note: the temperature to
+        score conversion uses the "feels like" temperature as its input and not the "true" temperature.
+
         Args:
             precip_scores_dict (dict): Dictionary mapping weather condition ids to a score for each (0 to 9)
 
         """
         for hour in self.hours:
-            hour.temp_score = forecast.temp_c_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
+            hour.temp_score = forecast.temp_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
             hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
@@ -195,6 +198,16 @@ class Day(TimePeriod):
         self.judge_score()
 
     def rank_segments(self, segments_to_rank=None):
+        """Sorts segments in preference order and bins them in the "rankings" structure with the appropriate alert level
+
+        For each segment to rank, this method orders the segments by best score, with the worst score in each used to
+        summarise the whole segment. The segments are added into the ranking structure at the appropriate alert levels
+        in this order to maintain information on the segment preference order.
+
+        Args:
+            segments_to_rank (list): List of segment to rank. This can be a subset of the segment in the day for example
+
+        """
         # By default use all segments in the day if not specified otherwise
         if not segments_to_rank:
             segments_to_rank = list(self.segments.values())
@@ -214,10 +227,8 @@ class Day(TimePeriod):
                     continue
                 segment_list.append(segment)
 
-    def weather_at_time(self, time):
-        pass
-
     def _segment_forecast(self):
+        """Adds hours to the segments given their time windows and aggregates the weather over those time periods"""
         for hour in self.hours:
             # Check if this hour is within any of the time segments
             for seg_name, segment in self.segments.items():
@@ -231,6 +242,15 @@ class Day(TimePeriod):
 
 
 class DaySegment(TimePeriod):
+    """A class representing a period/segment of the day e.g. morning
+
+    Attributes:
+        name (str): The name given to the period/segment of the day e.g. morning
+        start_time (object): datetime.time object representing the start time of the DaySegment
+        end_time (object): datetime.time object representing the end time of the DaySegment
+        duration (int): number of whole hours in the DaySegment
+
+    """
     def __init__(self, name, start_time, end_time):
         super().__init__()
         self.name = name
@@ -245,6 +265,13 @@ class DaySegment(TimePeriod):
         return f"{self.__class__.__name__}({self.name.title()}({self.start_time} - {self.end_time}))"
 
     def aggregate_weather(self):
+        """Averages, takes median or sums the weather params in the DaySegment and sets those DaySegment attributes.
+
+        Averages temperature, "feels like" temperature, wind speed and precipitation probability. Takes the median
+        weather condition as a summary of the weather during the segment. And sums the total precipitation volume
+        over the segment.
+
+        """
         all_temp_c = [hour.temp_c for hour in self.hours]
         all_feels_like = [hour.feels_like for hour in self.hours]
         all_wind_mps = [hour.wind_mps for hour in self.hours]
@@ -261,6 +288,11 @@ class DaySegment(TimePeriod):
 
 
 class Hour(TimeElement):
+    """A class representing the smallest element of time in this model
+
+    Attributes:
+        hr (int): Hour of the day (0 to 23)
+    """
     def __init__(self, hr):
         super().__init__()
         self.hr = hr

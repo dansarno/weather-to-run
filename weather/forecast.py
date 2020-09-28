@@ -37,9 +37,9 @@ def wind_speed_to_score(wind_speed):
     return round(min(max(score, 0), 9), 1)
 
 
-def temp_c_to_score(temp_c):
+def temp_to_score(temperature):
     # Empirical score (9-best, 0-worst)
-    score = (-0.023 * (temp_c - 20) ** 2) + 9
+    score = (-0.023 * (temperature - 20) ** 2) + 9
     return round(min(max(score, 0), 9), 1)
 
 
