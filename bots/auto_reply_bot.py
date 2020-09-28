@@ -18,10 +18,3 @@ def text_to_location(tweet_text):
         return {city_str: (result[0]["geometry"]["lat"], result[0]["geometry"]["lng"])}
     else:
         return None
-
-
-if __name__ == "__main__":
-
-    test_str = "fgdjk jkfgdjdh jfsklj fsfs Cork"
-    ans = text_to_location(test_str)
-    print(ans)

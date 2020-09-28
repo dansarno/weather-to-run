@@ -6,6 +6,21 @@ is_Local = True
 
 
 class TimeElement:
+    """A base class representing any length of time (hour, segment, day) for which there can be weather properties.
+
+    Attributes:
+        temp_c (float): Temperature in degrees Celsius
+        feels_like (float): "Feels like" temperature in degree Celsius
+        temp_score (float): Temperature score, with 9 being the best conditions and 0 being the worst
+        wind_mps (float): Wind speed in metres per second
+        wind_score (float): Wind score, with 9 being the best conditions and 0 being the worst
+        precipitation_type (str): Precipitation code from OpenWeatherMap
+            see https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+        precipitation_score (float): Precipitation score, with 9 being the best conditions and 0 being the worst
+        precipitation_prob (float): Probability of precipitation (0 to 1)
+        precipitation_mm (float): Volume of precipitation in millimetres
+
+    """
     def __init__(self):
         self.temp_c = 0
         self.feels_like = 0
@@ -19,12 +34,26 @@ class TimeElement:
 
 
 class TimePeriod(TimeElement):
+    """A class representing any length of time (segment, day) consisting of more a number of hours.
+
+    Attributes:
+        hours (list): A list of the Hour objects belonging to the TimePeriod
+        alert_level (str): Overall alert level of the weather for this TimePeriod (green, amber, red)
+
+    """
     def __init__(self):
         super().__init__()
         self.hours = []
         self.alert_level = ""
 
     def aggregate_score(self, method="min"):
+        """Averages or takes the minimum score of the hours in the TimePeriod for each weather parameters
+         and sets those score attributes.
+
+        Args:
+            method (str): The method of score aggregation, either "min" or "average"
+
+        """
         if self.hours:
             all_temp_scores = [hour.temp_score for hour in self.hours]
             all_wind_scores = [hour.wind_score for hour in self.hours]
@@ -42,6 +71,14 @@ class TimePeriod(TimeElement):
                 print(f'Aggregate score method "{method}" not recognised')  # Need to raise an error here instead
 
     def judge_score(self, bands=config.ALERT_BANDS):
+        """Sets the alert level attribute for this TimePeriod based off the worst score of any of the weather params.
+
+        Args:
+            bands (dict): The upper and lower score bands of the alert levels (green, amber, red)
+
+        Returns:
+            worst_score: The score of any of the weather parameters
+        """
         worst_alert_level = ""
         worst_score = min([self.temp_score, self.wind_score, self.precipitation_score])
         for alert_name, band_limits in bands.items():
@@ -52,7 +89,18 @@ class TimePeriod(TimeElement):
 
 
 class Day(TimePeriod):
-    TOMORROW = datetime.date.today() + datetime.timedelta(days=1)
+    """A class representing a 24 hour period.
+
+    Attributes:
+        sunrise (int): Sunrise time, Unix, UTC
+        sunset (int): Sunset time, Unix, UTC
+        date (object): datetime.day object
+        location (dict): City name (key) and a tuple of the decimal geographic coordinates (value)
+        rankings (dict): Alert levels (keys) and a list of Segment objects at those levels in preference order (values)
+        segments (dict): Segment names (keys) and the Segment objects (values)
+
+    """
+    TOMORROW = datetime.date.today() + datetime.timedelta(days=1)  # this maybe wrong
 
     def __init__(self, date=TOMORROW, segments=config.TIME_WINDOWS, location=config.LOCATION):
         super().__init__()
@@ -67,6 +115,7 @@ class Day(TimePeriod):
             day_type = "weekday"
         self.segments = {name: DaySegment(name, times[0], times[1]) for name, times in segments[day_type].items()}
 
+        # Add forecast after attribute construction
         self.add_forecast()
 
     def __str__(self):
@@ -78,9 +127,20 @@ class Day(TimePeriod):
                f"({', '.join([name.title() for name, segment in self.segments.items()])}))"
 
     def add_forecast(self):
+        """Fetches the weather forecast and adds the weather parameters to the class attributes.
+
+        Adds weather data to every time period level within a day (hour, segment, day). The data used is the 48 hour
+        forecast, for an hour by hour breakdown, and the 7 day forecast, for a whole day summary along with other
+        parameters like sunrise and sunset times. This information is filtered for the day and for the segment periods
+        specified in the object instance.
+
+        """
+        # Gather forecast using One Call API from OpenWeatherMap
         hourly_forecasts, daily_forecasts, timezone_offset = forecast.fetch_forecast(location=self.location)
+
         day_temps = []
         day_feels = []
+        # Hour level
         for hour_forecast in hourly_forecasts:
             is_this_day = self.date == datetime.datetime.utcfromtimestamp(hour_forecast["dt"] + timezone_offset).date()
             if not is_this_day:
@@ -97,8 +157,10 @@ class Day(TimePeriod):
             day_temps.append(hour_forecast["temp"])
             day_feels.append(hour_forecast["feels_like"])
 
+        # Segment level
         self._segment_forecast()
 
+        # Day level
         for day_forecast in daily_forecasts:
             is_this_day = self.date == datetime.datetime.utcfromtimestamp(day_forecast["dt"] + timezone_offset).date()
             if not is_this_day:
@@ -114,6 +176,13 @@ class Day(TimePeriod):
                 self.precipitation_mm = day_forecast["rain"]
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
+        """Maps weather conditions to scores for every hour in the day and aggregates scores over time periods.
+
+                
+        Args:
+            precip_scores_dict (dict): Dictionary mapping weather condition ids to a score for each (0 to 9)
+
+        """
         for hour in self.hours:
             hour.temp_score = forecast.temp_c_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
             hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
@@ -122,7 +191,6 @@ class Day(TimePeriod):
         for seg_name, segment in self.segments.items():
             segment.aggregate_score(method="min")  # the worst weather in that given time period
 
-        # self.average_score()  # average for the day determines the tone of the tweet
         self.aggregate_score(method="min")  # not obvious if the alert level should judged off the worst or av score
         self.judge_score()
 
