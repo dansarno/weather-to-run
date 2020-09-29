@@ -246,3 +246,52 @@ def plot_scores(day, rankings, to_show, filename):
         plt.show()
     else:
         plt.close()
+
+
+if __name__ == "__main__":
+
+    temps = [temp for temp in range(-10, 46, 1)]
+    temp_scores = []
+    for t in temps:
+        temp_scores.append(temp_to_score(t))
+
+    winds = [speed for speed in range(0, 41, 1)]
+    wind_scores = []
+    for w in winds:
+        wind_scores.append(wind_speed_to_score(w))
+
+    fig = plt.figure("Mappings", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
+    gs = fig.add_gridspec(nrows=1, ncols=2, left=0.1, bottom=0.16, top=0.95, right=0.96)
+    fig.patch.set_facecolor(colours.background)
+
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax1.plot(temps, scipy.ndimage.gaussian_filter(temp_scores, 1) + 1, color=colours.temp, linewidth=4.0)
+
+    ax1.set_facecolor(colours.background)
+    ax1.yaxis.set_major_locator(MultipleLocator(1))
+    ax1.set_ylim([1, 10.5])
+    ax1.tick_params(axis='x', colors='white')
+    ax1.tick_params(axis='y', colors='white')
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    ax1.spines['left'].set_visible(False)
+    ax1.spines['bottom'].set_color('white')
+    ax1.set_ylabel("BOT RATING", color='white', fontweight="light")
+    ax1.set_xlabel("TEMPERATURE (℃)", color='white', fontweight="light")
+
+    ax2 = fig.add_subplot(gs[0, 1])
+    ax2.plot(winds, scipy.ndimage.gaussian_filter(wind_scores, 1) + 1, color=colours.wind, linewidth=4.0)
+
+    ax2.set_facecolor(colours.background)
+    ax2.yaxis.set_major_locator(MultipleLocator(1))
+    ax2.set_ylim([1, 10.5])
+    ax2.tick_params(axis='x', colors='white')
+    ax2.tick_params(axis='y', colors='white')
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['left'].set_visible(False)
+    ax2.spines['bottom'].set_color('white')
+    ax2.set_ylabel("BOT RATING", color='white', fontweight="light")
+    ax2.set_xlabel("WIND SPEED (m/s)", color='white', fontweight="light")
+
+    plt.show()

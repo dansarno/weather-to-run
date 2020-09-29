@@ -21,7 +21,7 @@ WEATHER_WEIGHTINGS = {"temperature": 0.33,
                       "precipitation": 0.33
                       }
 
-LOCATION = {"London": (51.5074, 0.1278)}  # Needs to be generalised in the future
+LOCATION = {"London": (51.5074, 0.1278)}
 
 # My judgement on the best weather conditions to run in (9-best, 0-worst)
 PRECIPITATION_SCORES = {
