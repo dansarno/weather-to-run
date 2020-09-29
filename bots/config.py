@@ -14,6 +14,7 @@ logger.addHandler(stream_handler)
 
 
 def create_api():
+    """Reads authentication credentials from environment variables and creates the Tweepy API object"""
     consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
     consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
     access_token = os.getenv("TWITTER_ACCESS_TOKEN")

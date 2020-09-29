@@ -4,6 +4,7 @@ from geotext import GeoText
 
 
 def create_geocoder_obj():
+    """Reads authentication credentials from environment variables and creates the geocoder API object"""
     geocoder_api_key = os.getenv("GEOCODER_API_KEY")
     return OpenCageGeocode(geocoder_api_key)
 
