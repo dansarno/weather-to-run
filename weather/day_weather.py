@@ -288,7 +288,7 @@ class DaySegment(TimePeriod):
 
 
 class Hour(TimeElement):
-    """A class representing the smallest element of time in this model
+    """A class representing the smallest element of time in this model.
 
     Attributes:
         hr (int): Hour of the day (0 to 23)

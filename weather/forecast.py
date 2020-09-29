@@ -12,6 +12,17 @@ from weather import dashboard_colours as colours
 
 
 def fetch_forecast(location):
+    """Makes API call to OpenWeatherMap to get the weather forecast for a specific location.
+
+    Args:
+        location (dict): City name (key) and a tuple of the decimal geographic coordinates (value)
+
+    Returns:
+        hourly_forecast: Dictionary of the 48 hour weather data API response
+        daily_forecast: Dictionary of the 7 day weather data API response
+        timezone_offset: Shift in seconds from UTC of this location
+
+    """
 
     api_key = os.getenv("OPENWEATHER_API_KEY")
 
@@ -32,21 +43,27 @@ def fetch_forecast(location):
 
 
 def wind_speed_to_score(wind_speed):
-    # Empirical score (9-best, 0-worst) based off the Beaufort scale
+    """Empirical mapping of wind speed to a score (9-best, 0-worst) based off the Beaufort scale."""
     score = 10 - ((wind_speed ** (7 / 6)) / 6)
     return round(min(max(score, 0), 9), 1)
 
 
 def temp_to_score(temperature):
-    # Empirical score (9-best, 0-worst)
+    """Empirical mapping of temperature to a score (9-best, 0-worst)."""
     score = (-0.023 * (temperature - 20) ** 2) + 9
     return round(min(max(score, 0), 9), 1)
 
 
 def plot_scores(day, rankings, to_show, filename):
+    """Generate dashboard plot for a given day and save to disk or show to user.
 
-    # TODO: This plotting protocol needs porting over to main where it can be integrated with true weather data
-    # TODO: Also need to sort out how to gradient the segment patches so they fade out towards the top
+    Args:
+        day (object): DayWeather object to be plotted
+        rankings (dict): Alert levels (keys) and a list of Segment objects at those levels in preference order (values)
+        to_show (bool): True - plt.show() is called, False - it isn't and the plot is cleared
+        filename (str): File path (relative to the project directory) where the plot is to be saved
+
+    """
 
     all_scores = [(hour.temp_score, hour.wind_score, hour.precipitation_score) for hour in day.hours]
     temp, wind, precip = list(zip(*all_scores))
