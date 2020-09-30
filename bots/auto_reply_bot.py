@@ -21,13 +21,15 @@ def text_to_location(tweet_text):
 
     Returns:
         Location dict or None: If a recognised city is in the tweet_text, a location is returned. Else, return None
+        Offset: Number of seconds from UTC
     """
     geo = create_geocoder_obj()
 
     city_list = GeoText(tweet_text).cities
     if city_list:
         city_str = city_list[0]
-        result = geo.geocode(city_str, no_annotations=1)
-        return {city_str: (result[0]["geometry"]["lat"], result[0]["geometry"]["lng"])}
+        result = geo.geocode(city_str)
+        offset = result[0]["annotations"]["timezone"]["offset_sec"]
+        return {city_str: (result[0]["geometry"]["lat"], result[0]["geometry"]["lng"])}, offset
     else:
         return None

@@ -1,5 +1,6 @@
 import logging
 import schedule
+import datetime
 import tweepy
 from weather import day_weather
 from weather import forecast
@@ -46,7 +47,8 @@ def daily_tweet(api_obj, debug=False):
         debug (bool): By default (False) the post is sent to Twitter. If True, the post is not sent and the dashboard
             image is shown on screen.
     """
-    tomorrow = day_weather.Day()
+    date_of_next_day = datetime.date.today() + datetime.timedelta(days=1)
+    tomorrow = day_weather.Day(date_of_next_day)
     tomorrow.score_forecast()
     tomorrow.rank_segments()
     choices, order = rankings_interpreter(tomorrow.rankings)
@@ -100,9 +102,9 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
         if any(hashtag_str == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
             logger.info(f"Answering {tweet.user.name}")
 
-            loc = auto_reply_bot.text_to_location(tweet.text)
+            loc, offset_sec = auto_reply_bot.text_to_location(tweet.text)
             if loc:
-                reply_text, dashboard_file = tweet_your_weather(loc)
+                reply_text, dashboard_file = tweet_your_weather(loc, offset_sec)
 
                 # Upload media
                 media = api_obj.media_upload(dashboard_file)
@@ -129,16 +131,20 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
         f.write(str(new_since_id))
 
 
-def tweet_your_weather(location):
+def tweet_your_weather(location, offset):
     """Generates tweet text and a dashboard image given a user specified location.
 
     Args:
         location (dict): A single element dictionary with the city name as the key and lat and long tuple as the value.
+        offset (int): Number of seconds from UTC
 
     Returns:
         Tweet text string and the filename string indicating the location of the saved dashboard image
     """
-    your_tomorrow = day_weather.Day(location=location)
+    hour_delta = offset / 60 / 60
+    their_next_day = datetime.datetime.now() + datetime.timedelta(days=1) + datetime.timedelta(hours=hour_delta)
+    their_next_date = their_next_day.date()
+    your_tomorrow = day_weather.Day(their_next_date, location=location)
     your_tomorrow.score_forecast()
     your_tomorrow.rank_segments()
     choices, order = rankings_interpreter(your_tomorrow.rankings)
@@ -170,7 +176,3 @@ if __name__ == "__main__":
 
     while True:
         schedule.run_pending()
-
-    # test_loc = {"Houston": (29.760427, -95.369804)}
-    # # test_loc = {"Tokyo": (35.689487, 139.691711)}
-    # tweet_your_weather(test_loc)

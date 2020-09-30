@@ -100,9 +100,7 @@ class Day(TimePeriod):
         segments (dict): Segment names (keys) and the Segment objects (values)
 
     """
-    TOMORROW = datetime.date.today() + datetime.timedelta(days=1)  # this maybe wrong
-
-    def __init__(self, date=TOMORROW, segments=config.TIME_WINDOWS, location=config.LOCATION):
+    def __init__(self, date, segments=config.TIME_WINDOWS, location=config.LOCATION):
         super().__init__()
         self.sunrise = 0
         self.sunset = 0
