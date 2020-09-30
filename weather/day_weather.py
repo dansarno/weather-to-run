@@ -135,7 +135,7 @@ class Day(TimePeriod):
         specified in the object instance.
 
         """
-        # Gather forecast using One Call API from OpenWeatherMap
+        # Fetch forecast using One Call API from OpenWeatherMap
         hourly_forecasts, daily_forecasts, timezone_offset = forecast.fetch_forecast(location=self.location)
 
         day_temps = []

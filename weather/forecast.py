@@ -59,7 +59,7 @@ def plot_scores(day, rankings, to_show, filename):
 
     Args:
         day (object): DayWeather object to be plotted
-        rankings (dict): Alert levels (keys) and a list of Segment objects at those levels in preference order (values)
+        rankings (list): List of Segment objects at those levels in preference order
         to_show (bool): True - plt.show() is called, False - it isn't and the plot is cleared
         filename (str): File path (relative to the project directory) where the plot is to be saved
 
