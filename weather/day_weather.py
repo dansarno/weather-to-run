@@ -184,14 +184,17 @@ class Day(TimePeriod):
             precip_scores_dict (dict): Dictionary mapping weather condition ids to a score for each (0 to 9)
 
         """
+        # Hour level
         for hour in self.hours:
             hour.temp_score = forecast.temp_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
             hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
             hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
 
+        # Segment level
         for seg_name, segment in self.segments.items():
             segment.aggregate_score(method="min")  # the worst weather in that given time period
 
+        # Day level
         self.aggregate_score(method="min")  # not obvious if the alert level should judged off the worst or av score
         self.judge_score()
 
