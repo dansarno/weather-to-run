@@ -67,6 +67,8 @@ def daily_tweet(api_obj, debug=False):
         api_obj.update_status(status=tweet_text, media_ids=[media.media_id])
 
         logger.info("Daily tweet posted")
+    else:
+        print(tweet_text)
 
 
 def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
@@ -168,11 +170,11 @@ if __name__ == "__main__":
     # Create API object
     api = config.create_api()
     # Get latest mention tweet_id
-    last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
+    # last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
 
-    # daily_tweet(api, debug=True)
-    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
-    schedule.every().day.at("22:00").do(daily_tweet, api)
+    daily_tweet(api, debug=True)
+    # schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
+    # schedule.every().day.at("22:00").do(daily_tweet, api)
 
-    while True:
-        schedule.run_pending()
+    # while True:
+    #     schedule.run_pending()

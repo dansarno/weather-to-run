@@ -75,17 +75,17 @@ class TimePeriod(TimeElement):
 
         Args:
             bands (dict): The upper and lower score bands of the alert levels (green, amber, red)
-
-        Returns:
-            worst_score: The score of any of the weather parameters
         """
         worst_alert_level = ""
-        worst_score = min([self.temp_score, self.wind_score, self.precipitation_score])
+        worst_score = self.calc_worst_score()
         for alert_name, band_limits in bands.items():
             if band_limits[0] <= round(worst_score, 1) <= band_limits[1]:
                 worst_alert_level = alert_name
         self.alert_level = worst_alert_level
-        return worst_score
+
+    def calc_worst_score(self):
+        """Calculate what, of all of the weather parameters, is the worst score."""
+        return min([self.temp_score, self.wind_score, self.precipitation_score])
 
 
 class Day(TimePeriod):
@@ -193,6 +193,7 @@ class Day(TimePeriod):
         # Segment level
         for seg_name, segment in self.segments.items():
             segment.aggregate_score(method="min")  # the worst weather in that given time period
+            segment.judge_score()
 
         # Day level
         self.aggregate_score(method="min")  # not obvious if the alert level should judged off the worst or av score
@@ -216,9 +217,9 @@ class Day(TimePeriod):
         seg_and_worst_score = []
         for segment in segments_to_rank:
             # Out of temp, wind, precip... which is the worst and whats its score
-            worst_score = segment.judge_score()
+            worst_score = segment.calc_worst_score()
             seg_and_worst_score.append([segment, worst_score])
-        # Sort segments by worst score
+        # Sort segments by worst score (descending)
         ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
 
         self.rankings = {"Green": [], "Amber": [], "Red": []}  # reset rankings
