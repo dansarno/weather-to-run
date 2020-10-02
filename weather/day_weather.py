@@ -70,7 +70,7 @@ class TimePeriod(TimeElement):
             else:
                 print(f'Aggregate score method "{method}" not recognised')  # Need to raise an error here instead
 
-    def judge_score(self, bands=config.ALERT_BANDS):
+    def set_alert_level(self, bands=config.ALERT_BANDS):
         """Sets the alert level attribute for this TimePeriod based off the worst score of any of the weather params.
 
         Args:
@@ -86,6 +86,11 @@ class TimePeriod(TimeElement):
     def calc_worst_score(self):
         """Calculate what, of all of the weather parameters, is the worst score."""
         return min([self.temp_score, self.wind_score, self.precipitation_score])
+
+    def calc_average_score(self):
+        """Calculate the average score of all the weather parameters"""
+        all_parameters = [self.temp_score, self.wind_score, self.precipitation_score]
+        return sum(all_parameters) / len(all_parameters)
 
 
 class Day(TimePeriod):
@@ -171,7 +176,8 @@ class Day(TimePeriod):
             self.precipitation_type = str(int(day_forecast["weather"][0]["id"]))
             self.precipitation_prob = day_forecast["pop"]
             if "rain" in day_forecast.keys():
-                self.precipitation_mm = day_forecast["rain"]
+                # self.precipitation_mm = day_forecast["rain"]
+                self.precipitation_mm = sum([seg.precipitation_mm for seg in self.segments.values()])
 
     def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
         """Maps weather conditions to scores for every hour in the day and aggregates scores over time periods.
@@ -193,11 +199,11 @@ class Day(TimePeriod):
         # Segment level
         for seg_name, segment in self.segments.items():
             segment.aggregate_score(method="min")  # the worst weather in that given time period
-            segment.judge_score()
+            segment.set_alert_level()
 
         # Day level
         self.aggregate_score(method="min")  # not obvious if the alert level should judged off the worst or av score
-        self.judge_score()
+        self.set_alert_level()
 
     def rank_segments(self, segments_to_rank=None):
         """Sorts segments in preference order and bins them in the "rankings" structure with the appropriate alert level
@@ -223,7 +229,27 @@ class Day(TimePeriod):
         ordered_seg_and_worst_score = sorted(seg_and_worst_score, reverse=True, key=lambda x: x[1])
 
         self.rankings = {"Green": [], "Amber": [], "Red": []}  # reset rankings
-        for segment, worst_score in ordered_seg_and_worst_score:
+        for segment, _ in ordered_seg_and_worst_score:
+            for name, segment_list in self.rankings.items():
+                if not segment.alert_level.lower() == name.lower():
+                    continue
+                segment_list.append(segment)
+
+    def rank_segments_2(self, segments_to_rank=None):
+
+        # By default use all segments in the day if not specified otherwise
+        if not segments_to_rank:
+            segments_to_rank = list(self.segments.values())
+
+        seg_and_av_score = []
+        for segment in segments_to_rank:
+            average_score = segment.calc_average_score()
+            seg_and_av_score.append([segment, average_score])
+        # Sort segments by average score (descending)
+        ordered_seg_and_av_score = sorted(seg_and_av_score, reverse=True, key=lambda x: x[1])
+
+        self.rankings = {"Green": [], "Amber": [], "Red": []}  # reset rankings
+        for segment, _ in ordered_seg_and_av_score:
             for name, segment_list in self.rankings.items():
                 if not segment.alert_level.lower() == name.lower():
                     continue

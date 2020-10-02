@@ -36,7 +36,7 @@ def rankings_interpreter(rankings):
     return best_segments, all_segements
 
 
-def daily_tweet(api_obj, debug=False):
+def daily_tweet(api_obj, method, debug=False):
     """Automatically updates the bot's tweet status with the next day's run weather and dashboard image.
 
     Creates a default instance of the Day class (location=London, day=tomorrow) and generates tweet text and a
@@ -50,7 +50,12 @@ def daily_tweet(api_obj, debug=False):
     date_of_next_day = datetime.date.today() + datetime.timedelta(days=1)
     tomorrow = day_weather.Day(date_of_next_day)
     tomorrow.score_forecast()
-    tomorrow.rank_segments()
+    if method == "old":
+        tomorrow.rank_segments()
+    elif method == "new":
+        tomorrow.rank_segments_2()
+    else:
+        print(f"Method of {method} is not recognised.")
     choices, order = rankings_interpreter(tomorrow.rankings)
     tone = tomorrow.alert_level
 
@@ -170,11 +175,11 @@ if __name__ == "__main__":
     # Create API object
     api = config.create_api()
     # Get latest mention tweet_id
-    # last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
+    last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
 
-    daily_tweet(api, debug=True)
-    # schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
-    # schedule.every().day.at("22:00").do(daily_tweet, api)
+    # daily_tweet(api, "new", debug=True)
+    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
+    schedule.every().day.at("22:00").do(daily_tweet, api, "new")
 
-    # while True:
-    #     schedule.run_pending()
+    while True:
+        schedule.run_pending()
