@@ -95,8 +95,6 @@ def reply_to_mentions(bot, api_obj, hashtag_str):
     # Get the most recent mention tweet id stored in the profile state
     new_since_id = bot.last_mention_id
 
-    logger.info(f"Latest mention ID: {new_since_id}")
-
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=new_since_id).items():
         # Update new_since_id if newer tweets are in the mentions timeline
         new_since_id = max(tweet.id, new_since_id)
