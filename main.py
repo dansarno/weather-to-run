@@ -2,6 +2,7 @@ import logging
 import schedule
 import datetime
 import tweepy
+import bot_state
 from weather import day_weather
 from weather import forecast
 from bots import tweet_composer
@@ -76,7 +77,7 @@ def daily_tweet(api_obj, method, debug=False):
         print(tweet_text)
 
 
-def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
+def reply_to_mentions(bot, api_obj, hashtag_str):
     """Automatically replies to users with their run weather forecast and dashboard images.
 
     Makes an API call to retrieve the bot's mentions timeline for any new mentions. If new mentions are detected, they
@@ -85,19 +86,16 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
     that city. If no city name is found, the bot account replies to the user to inform them as such.
 
     Args:
+        bot (object): Twitter account object, storing the state of the profile
         api_obj (Tweepy API object): An instance of the Tweepy API class.
         hashtag_str (str): The hashtag string used to trigger an auto-reply response from the bot.
-        initial_since_id (int): The latest mention tweet id. This id is used to limit the mentions timeline search
-            to those already handled by this function.
     """
     logger.info("Retrieving mentions...")
 
-    # Get the tweet id of the last mention to be handled by this function (cached in a txt file)
-    with open("bots/last_checked_tweet_id.txt", "r") as f:
-        since_id_from_file = int(f.read())
+    # Get the most recent mention tweet id stored in the profile state
+    new_since_id = bot.last_mention_id
 
-    # Use whichever is "newest": from cache or from initial check on start-up
-    new_since_id = max(since_id_from_file, initial_since_id)
+    logger.info(f"Latest mention ID: {new_since_id}")
 
     for tweet in tweepy.Cursor(api_obj.mentions_timeline, since_id=new_since_id).items():
         # Update new_since_id if newer tweets are in the mentions timeline
@@ -133,9 +131,8 @@ def reply_to_mentions(api_obj, hashtag_str, initial_since_id):
                     auto_populate_reply_metadata=True
                 )
 
-    # Cache the last mention tweet id
-    with open("bots/last_checked_tweet_id.txt", "w") as f:
-        f.write(str(new_since_id))
+    # Update the most recent mention tweet id in the profile state
+    bot.last_mention_id = new_since_id
 
 
 def tweet_your_weather(location, offset):
@@ -174,11 +171,11 @@ if __name__ == "__main__":
 
     # Create API object
     api = config.create_api()
-    # Get latest mention tweet_id
-    last_tweet_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id
+    # Create Profile object
+    bot_account = bot_state.TwitterProfile(api)
 
     # daily_tweet(api, "new", debug=True)
-    schedule.every(15).seconds.do(reply_to_mentions, api, tag, last_tweet_id)
+    schedule.every(15).seconds.do(reply_to_mentions, bot_account, api, tag)
     schedule.every().day.at("22:00").do(daily_tweet, api, "new")
 
     while True:
