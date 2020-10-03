@@ -23,7 +23,7 @@ Media:
 The following is a description of the automated processes performed by the Twitter bot.
 
 ### Daily Tweet
-Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled for at 8pm London time 
+Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled for at 10pm London time 
 and follow the format outlined above.
 
 ### Auto-Reply
@@ -32,13 +32,13 @@ Automatically replies to Twitter users that @ mentions the account to discover w
 time to run in their location is. The replies must follow these formatting rules (outlined in the bot's bio):
 - Be an @ mention to the [@weather_to_run](https://twitter.com/weather_to_run) account
 - Use the hashtag #myweather
-- Contain their location information, either as...
-    - The english name and spelling of the nearest major city
-    - Or, latitude and logitude coordinates (_not yet implemented_)
+- Contain their location information as the english name and spelling of the nearest major city. The city name can be
+anywhere in the body of the tweet text. For example "[@weather_to_run](https://twitter.com/weather_to_run) #myweather
+can you tell me the weather in the great city of Manchester? Thanksss" will pick out the city name Manchester.
     
 An example reply and response by the Twitter bot would be:
 
-Reply: "@weather_to_run #myweather Houston"
+Reply: "[@weather_to_run](https://twitter.com/weather_to_run) #myweather Houston"
 
 Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best guess... I say go for it"
 
