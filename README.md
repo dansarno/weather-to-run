@@ -75,7 +75,7 @@ Encapsulation of the API response allows for more convenient handling of hours a
 any arbitrary period of the time (morning, afternoon and evening) with the same interface, attributes and methods.
 
 A TimeElement is the "base" class. Any portion of time is a form of TimeElement and has all of the weather parameters
-outlined above, along with attributes of their associated scores. Since an hour is considered the smallest unit of time
+outlined above, along with their associated scores. Since an hour is considered the smallest unit of time
 in this model, it directly inherits from TimeElement and is described in the concrete class Hour.
 
 In order to provide a common interface, the class TimePeriod outlines spans of time like days and segments of the day.

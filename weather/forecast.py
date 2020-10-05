@@ -42,18 +42,6 @@ def fetch_forecast(location):
     return hourly_forecast, daily_forecast, timezone_offset
 
 
-def wind_speed_to_score(wind_speed):
-    """Empirical mapping of wind speed to a score (9-best, 0-worst) based off the Beaufort scale."""
-    score = 10 - ((wind_speed ** (7 / 6)) / 6)
-    return round(min(max(score, 0), 9), 1)
-
-
-def temp_to_score(temperature):
-    """Empirical mapping of temperature to a score (9-best, 0-worst)."""
-    score = (-0.023 * (temperature - 20) ** 2) + 9
-    return round(min(max(score, 0), 9), 1)
-
-
 def plot_scores(day, rankings, to_show, filename):
     """Generate dashboard plot for a given day and save to disk or show to user.
 
