@@ -58,6 +58,24 @@ def _generate_forecast_lines(day_obj):
     return time_smooth, temp_smooth, wind_smooth, precip_smooth
 
 
+def _add_dashboard_text_to_figure(fig_handle, day_obj, preferences):
+    fig_handle.text(0.045, 0.9, "Weather to run or bot".upper(), color='white', fontsize=18, fontweight='bold')
+    fig_handle.text(0.52, 0.9, f"{day_obj.date:%d.%m.%y}", color='white', fontsize=18, fontweight='ultralight')
+
+    fig_handle.text(0.05, 0.8, "LOCATION:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.17, 0.8, f"{list(day_obj.location.keys())[0].upper()}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.05, 0.75, "SUNRISE:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.17, 0.75, f"{day_obj.sunrise:%H:%M}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.05, 0.7, "SUNSET:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.17, 0.7, f"{day_obj.sunset:%H:%M}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.35, 0.8, "BEST OPTION:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.55, 0.8, f"{preferences[0].upper()}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.35, 0.75, "BACKUP OPTION:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.55, 0.75, f"{preferences[1].upper()}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.35, 0.7, "FINAL OPTION:", color=colours.info_field, fontsize=12)
+    fig_handle.text(0.55, 0.7, f"{preferences[2].upper()}", color=colours.info_text, fontsize=12)
+
+
 def plot_scores(day, rankings, to_show, filename):
     """Generate dashboard plot for a given day and save to disk or show to user.
 
@@ -76,25 +94,10 @@ def plot_scores(day, rankings, to_show, filename):
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.08, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
     fig.patch.set_facecolor(colours.background)
+
+    _add_dashboard_text_to_figure(fig, day, rankings)
+
     ax = fig.add_subplot(gs[-2:, :-1])
-
-    fig.text(0.045, 0.9, "Weather to run or bot".upper(), color='white', fontsize=18, fontweight='bold')
-
-    fig.text(0.05, 0.8, "LOCATION:", color=colours.info_field, fontsize=12)
-    fig.text(0.17, 0.8, f"{list(day.location.keys())[0].upper()}", color=colours.info_text, fontsize=12)
-    fig.text(0.05, 0.75, "SUNRISE:", color=colours.info_field, fontsize=12)
-    fig.text(0.17, 0.75, f"{day.sunrise:%H:%M}", color=colours.info_text, fontsize=12)
-    fig.text(0.05, 0.7, "SUNSET:", color=colours.info_field, fontsize=12)
-    fig.text(0.17, 0.7, f"{day.sunset:%H:%M}", color=colours.info_text, fontsize=12)
-    fig.text(0.35, 0.8, "BEST OPTION:", color=colours.info_field, fontsize=12)
-    fig.text(0.55, 0.8, f"{rankings[0].upper()}", color=colours.info_text, fontsize=12)
-    fig.text(0.35, 0.75, "BACKUP OPTION:", color=colours.info_field, fontsize=12)
-    fig.text(0.55, 0.75, f"{rankings[1].upper()}", color=colours.info_text, fontsize=12)
-    fig.text(0.35, 0.7, "FINAL OPTION:", color=colours.info_field, fontsize=12)
-    fig.text(0.55, 0.7, f"{rankings[2].upper()}", color=colours.info_text, fontsize=12)
-
-    fig.text(0.52, 0.9, f"{day.date:%d.%m.%y}", color='white', fontsize=18, fontweight='ultralight')
-
     for name, seg in day.segments.items():
         rect_width = seg.duration + 0.9
         x = seg.start_time.hour
