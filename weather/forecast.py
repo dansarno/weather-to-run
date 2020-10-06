@@ -42,20 +42,10 @@ def fetch_forecast(location):
     return hourly_forecast, daily_forecast, timezone_offset
 
 
-def plot_scores(day, rankings, to_show, filename):
-    """Generate dashboard plot for a given day and save to disk or show to user.
-
-    Args:
-        day (object): DayWeather object to be plotted
-        rankings (list): List of Segment objects at those levels in preference order
-        to_show (bool): True - plt.show() is called, False - it isn't and the plot is cleared
-        filename (str): File path (relative to the project directory) where the plot is to be saved
-
-    """
-
-    all_scores = [(hour.temp_score, hour.wind_score, hour.precipitation_score) for hour in day.hours]
+def _generate_forecast_lines(day_obj):
+    all_scores = [(hour.temp_score, hour.wind_score, hour.precipitation_score) for hour in day_obj.hours]
     temp, wind, precip = list(zip(*all_scores))
-    times = [hour.hr for hour in day.hours]
+    times = [hour.hr for hour in day_obj.hours]
 
     f_t = interp1d(times, temp, kind='linear')
     f_w = interp1d(times, wind, kind='linear')
@@ -65,7 +55,23 @@ def plot_scores(day, rankings, to_show, filename):
     temp_smooth = scipy.ndimage.gaussian_filter(f_t(time_smooth), 3)
     wind_smooth = scipy.ndimage.gaussian_filter(f_w(time_smooth), 3)
     precip_smooth = scipy.ndimage.gaussian_filter(f_p(time_smooth), 3)
+    return time_smooth, temp_smooth, wind_smooth, precip_smooth
 
+
+def plot_scores(day, rankings, to_show, filename):
+    """Generate dashboard plot for a given day and save to disk or show to user.
+
+    Args:
+        day (): DayWeather object to be plotted
+        rankings (list): List of Segment objects at those levels in preference order
+        to_show (bool): True - plt.show() is called, False - it isn't and the plot is cleared
+        filename (str): File path (relative to the project directory) where the plot is to be saved
+
+    """
+
+    time, temp, wind, precip = _generate_forecast_lines(day)
+
+    # Create the figure
     fig = plt.figure("Weather Dashboard", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.08, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
@@ -117,9 +123,9 @@ def plot_scores(day, rankings, to_show, filename):
     ax.spines['left'].set_visible(False)
     ax.spines['bottom'].set_color('white')
 
-    ax.plot(time_smooth, temp_smooth + 1, color=colours.temp, linewidth=4.0, zorder=5)
-    ax.plot(time_smooth, wind_smooth + 1, color=colours.wind, linewidth=4.0, zorder=5)
-    ax.plot(time_smooth, precip_smooth + 1, color=colours.precip, linewidth=4.0, zorder=5)
+    ax.plot(time, temp + 1, color=colours.temp, linewidth=4.0, zorder=5)
+    ax.plot(time, wind + 1, color=colours.wind, linewidth=4.0, zorder=5)
+    ax.plot(time, precip + 1, color=colours.precip, linewidth=4.0, zorder=5)
     ax.set_ylabel("BOT RATING", color='white', fontweight="light")
 
     ax2 = fig.add_subplot(gs[0, -1])
@@ -237,52 +243,3 @@ def plot_scores(day, rankings, to_show, filename):
         plt.show()
     else:
         plt.close()
-
-
-if __name__ == "__main__":
-
-    temps = [temp for temp in range(-10, 46, 1)]
-    temp_scores = []
-    for t in temps:
-        temp_scores.append(temp_to_score(t))
-
-    winds = [speed for speed in range(0, 41, 1)]
-    wind_scores = []
-    for w in winds:
-        wind_scores.append(wind_speed_to_score(w))
-
-    fig = plt.figure("Mappings", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
-    gs = fig.add_gridspec(nrows=1, ncols=2, left=0.1, bottom=0.16, top=0.95, right=0.96)
-    fig.patch.set_facecolor(colours.background)
-
-    ax1 = fig.add_subplot(gs[0, 0])
-    ax1.plot(temps, scipy.ndimage.gaussian_filter(temp_scores, 1) + 1, color=colours.temp, linewidth=4.0)
-
-    ax1.set_facecolor(colours.background)
-    ax1.yaxis.set_major_locator(MultipleLocator(1))
-    ax1.set_ylim([1, 10.5])
-    ax1.tick_params(axis='x', colors='white')
-    ax1.tick_params(axis='y', colors='white')
-    ax1.spines['top'].set_visible(False)
-    ax1.spines['right'].set_visible(False)
-    ax1.spines['left'].set_visible(False)
-    ax1.spines['bottom'].set_color('white')
-    ax1.set_ylabel("BOT RATING", color='white', fontweight="light")
-    ax1.set_xlabel("TEMPERATURE (℃)", color='white', fontweight="light")
-
-    ax2 = fig.add_subplot(gs[0, 1])
-    ax2.plot(winds, scipy.ndimage.gaussian_filter(wind_scores, 1) + 1, color=colours.wind, linewidth=4.0)
-
-    ax2.set_facecolor(colours.background)
-    ax2.yaxis.set_major_locator(MultipleLocator(1))
-    ax2.set_ylim([1, 10.5])
-    ax2.tick_params(axis='x', colors='white')
-    ax2.tick_params(axis='y', colors='white')
-    ax2.spines['top'].set_visible(False)
-    ax2.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-    ax2.spines['bottom'].set_color('white')
-    ax2.set_ylabel("BOT RATING", color='white', fontweight="light")
-    ax2.set_xlabel("WIND SPEED (m/s)", color='white', fontweight="light")
-
-    plt.show()
