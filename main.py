@@ -37,6 +37,7 @@ def rankings_interpreter(rankings):
     return best_segments, all_segements
 
 
+# TODO - make debug an environment variable
 def daily_tweet(api_obj, method, debug=False):
     """Automatically updates the bot's tweet status with the next day's run weather and dashboard image.
 

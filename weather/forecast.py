@@ -61,7 +61,10 @@ def plot_scores(day, rankings, to_show, filename):
     f_w = interp1d(times, wind, kind='linear')
     f_p = interp1d(times, precip, kind='linear')
 
-    x_smooth = np.linspace(min(times), max(times), 200)
+    time_smooth = np.linspace(min(times), max(times), 200)
+    temp_smooth = scipy.ndimage.gaussian_filter(f_t(time_smooth), 3)
+    wind_smooth = scipy.ndimage.gaussian_filter(f_w(time_smooth), 3)
+    precip_smooth = scipy.ndimage.gaussian_filter(f_p(time_smooth), 3)
 
     fig = plt.figure("Weather Dashboard", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.08, bottom=0.12, top=0.95)
@@ -114,9 +117,9 @@ def plot_scores(day, rankings, to_show, filename):
     ax.spines['left'].set_visible(False)
     ax.spines['bottom'].set_color('white')
 
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_t(x_smooth), 3) + 1, color=colours.temp, linewidth=4.0, zorder=5)
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_w(x_smooth), 3) + 1, color=colours.wind, linewidth=4.0, zorder=5)
-    ax.plot(x_smooth, scipy.ndimage.gaussian_filter(f_p(x_smooth), 3) + 1, color=colours.precip, linewidth=4.0, zorder=5)
+    ax.plot(time_smooth, temp_smooth + 1, color=colours.temp, linewidth=4.0, zorder=5)
+    ax.plot(time_smooth, wind_smooth + 1, color=colours.wind, linewidth=4.0, zorder=5)
+    ax.plot(time_smooth, precip_smooth + 1, color=colours.precip, linewidth=4.0, zorder=5)
     ax.set_ylabel("BOT RATING", color='white', fontweight="light")
 
     ax2 = fig.add_subplot(gs[0, -1])
