@@ -53,8 +53,7 @@ Automatically follows anyone who follows the [@weather_to_run](https://twitter.c
 
 ### Day Weather Object
 
-Encapsulation of OpenWeatherMap's One Call API response, adding a model layer and other convenient functionality 
-on top of it. 
+Encapsulation of OpenWeatherMap's One Call API response, adding model classes for convenient use and functionality. 
 
 The One Call API response returns weather data for a given geographic location. The main information used in this model
 are the:
