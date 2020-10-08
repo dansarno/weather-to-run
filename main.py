@@ -106,7 +106,7 @@ def reply_to_mentions(bot, api_obj, hashtag_str):
             continue
 
         if any(hashtag_str == hashtag["text"] for hashtag in tweet.entities["hashtags"]):
-            logger.info(f"Answering {tweet.user.name}")
+            logger.info(f"Replying to {tweet.user.name}")
 
             loc, offset_sec = auto_reply_bot.text_to_location(tweet.text)
             if loc:
@@ -134,6 +134,13 @@ def reply_to_mentions(bot, api_obj, hashtag_str):
 
     # Update the most recent mention tweet id in the profile state
     bot.last_mention_id = new_since_id
+
+
+def follow_back(api_obj):
+    """Follow all users following the account"""
+    for follower in tweepy.Cursor(api_obj.followers).items():
+        logger.info(f"Following back new followers")
+        follower.follow()
 
 
 def tweet_your_weather(location, offset):
@@ -175,8 +182,9 @@ if __name__ == "__main__":
     # Create Profile object
     bot_account = bot_state.TwitterProfile(api)
 
-    daily_tweet(api, "new", debug=True)
-    # schedule.every(15).seconds.do(reply_to_mentions, bot_account, api, tag)
-    # schedule.every().day.at("22:00").do(daily_tweet, api, "new")
-    # while True:
-    #     schedule.run_pending()
+    # daily_tweet(api, "new", debug=True)
+    schedule.every(15).seconds.do(reply_to_mentions, bot_account, api, tag)
+    schedule.every(10).minutes.do(follow_back, api)
+    schedule.every().day.at("22:00").do(daily_tweet, api, "new")
+    while True:
+        schedule.run_pending()
