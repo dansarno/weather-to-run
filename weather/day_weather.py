@@ -32,6 +32,8 @@ class TimeElement:
         self.precipitation_prob = 0
         self.precipitation_mm = 0
 
+    # TODO look in to making these scoring methods interchangeable. Will likely need a new design pattern, perhaps
+    #  strategy pattern.
     def temp_to_score(self):
         """Empirical mapping of temperature to a score (9-best, 0-worst)."""
         score = (-0.023 * (self.feels_like - 20) ** 2) + 9
