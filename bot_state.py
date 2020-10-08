@@ -10,5 +10,5 @@ class TwitterProfile:
 
     """
     def __init__(self, api):
-        self.followers = []
+        self.followers = list(tweepy.Cursor(api.followers).items())
         self.last_mention_id = list(tweepy.Cursor(api.mentions_timeline).items(1))[0].id

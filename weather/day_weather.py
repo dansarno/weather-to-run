@@ -32,6 +32,22 @@ class TimeElement:
         self.precipitation_prob = 0
         self.precipitation_mm = 0
 
+    # TODO look in to making these scoring methods interchangeable. Will likely need a new design pattern, perhaps
+    #  strategy pattern.
+    def temp_to_score(self):
+        """Empirical mapping of temperature to a score (9-best, 0-worst)."""
+        score = (-0.023 * (self.feels_like - 20) ** 2) + 9
+        self.temp_score = round(min(max(score, 0), 9), 1)
+
+    def wind_speed_to_score(self):
+        """Empirical mapping of wind speed to a score (9-best, 0-worst) based off the Beaufort scale."""
+        score = 10 - ((self.wind_mps ** (7 / 6)) / 6)
+        self.wind_score = round(min(max(score, 0), 9), 1)
+
+    def precipitation_to_score(self, precip_scores_dict=config.PRECIPITATION_SCORES):
+        """Empirical mapping of precipitation types to a score (9-best, 0-worst)."""
+        self.precipitation_score = precip_scores_dict[self.precipitation_type]
+
 
 class TimePeriod(TimeElement):
     """A class representing any generic length of time (segment, day) consisting of a number of hours.
@@ -179,22 +195,19 @@ class Day(TimePeriod):
                 # self.precipitation_mm = day_forecast["rain"]
                 self.precipitation_mm = sum([seg.precipitation_mm for seg in self.segments.values()])
 
-    def score_forecast(self, precip_scores_dict=config.PRECIPITATION_SCORES):
+    def score_forecast(self):
         """Maps weather conditions to scores for every hour in the day and aggregates scores over time periods.
 
         Mapping for temperature and wind speed to scores are continuous functions whereas the precipitation score is
         a discrete mapping from weather condition ids to scores using precip_scores_dict. Note: the temperature to
         score conversion uses the "feels like" temperature as its input and not the "true" temperature.
 
-        Args:
-            precip_scores_dict (dict): Dictionary mapping weather condition ids to a score for each (0 to 9)
-
         """
         # Hour level
         for hour in self.hours:
-            hour.temp_score = forecast.temp_to_score(hour.feels_like)  # Using feels_like to score makes sense to me!
-            hour.wind_score = forecast.wind_speed_to_score(hour.wind_mps)
-            hour.precipitation_score = precip_scores_dict[hour.precipitation_type]
+            hour.temp_to_score()
+            hour.wind_speed_to_score()
+            hour.precipitation_to_score()
 
         # Segment level
         for seg_name, segment in self.segments.items():
