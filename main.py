@@ -1,11 +1,6 @@
 import logging
 import schedule
-import datetime
-import tweepy
 from bots import bot_state
-from weather import day_weather
-from weather import forecast
-from bots import tweet_composer
 from bots import config
 from bots import auto_reply_bot
 from bots import daily_tweet_bot
@@ -34,9 +29,8 @@ if __name__ == "__main__":
     bot_account = bot_state.TwitterProfile(api)
 
     # daily_tweet_bot.daily_tweet(api, "new", debug=True)
-    # schedule.every(15).seconds.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
     schedule.every(15).seconds.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
-    # schedule.every(10).minutes.do(followback_bot.follow_back, api, bot_account)
-    # schedule.every().day.at("22:00").do(daily_tweet_bot.daily_tweet, api, "new")
+    schedule.every(10).minutes.do(followback_bot.follow_back, api, bot_account)
+    schedule.every().day.at("22:00").do(daily_tweet_bot.daily_tweet, api, "new")
     while True:
         schedule.run_pending()
