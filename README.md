@@ -23,8 +23,19 @@ Media:
 The following is a description of the automated processes performed by the Twitter bot.
 
 ### Daily Tweet
-Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled for at 10pm London time 
+Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled to be posted at 10pm (London time) 
 and follow the format outlined above.
+
+Each day is split up into segments, which by default are: morning, afternoon and evening. The aim of the daily tweet 
+is to rank these segments in running condition order. The time periods for each segment are set assuming the bot's
+followers work typical office hours and are therefore free to run outside of those hours. The segment time periods also
+vary depending on the day of the week as follows:
+
+|           | Weekday     | Weekend     |
+|-----------|-------------|-------------|
+| Morning   | 06:00-10:00 | 06:00-12:00 |
+| Afternoon | 12:00-14:00 | 12:00-17:00 |
+| Evening   | 17:00-21:00 | 17:00-21:00 |
 
 ### Auto-Reply
 
@@ -45,7 +56,6 @@ Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best 
 ![Examples of auto-reply dashboard](readme_images/auto_reply_demo.gif)
 
 ### Follow Back
-_Not yet implemented_
 
 Automatically follows anyone who follows the [@weather_to_run](https://twitter.com/weather_to_run) account.
 

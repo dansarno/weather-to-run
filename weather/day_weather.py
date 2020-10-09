@@ -268,6 +268,20 @@ class Day(TimePeriod):
                     continue
                 segment_list.append(segment)
 
+    def rankings_interpreter(self):
+        """Simple ranking interpreter that returns the best ranked day segments"""
+        all_segements = []
+        best_segments = []
+        is_first = True
+        for level, segs in self.rankings.items():
+            if segs:
+                for seg in segs:
+                    all_segements.append(seg.name)
+                if is_first:
+                    best_segments = [seg.name for seg in segs]
+                    is_first = False
+        return best_segments, all_segements
+
     def _segment_forecast(self):
         """Adds hours to the segments given their time windows and aggregates the weather over those time periods"""
         for hour in self.hours:
