@@ -1,4 +1,5 @@
 # Weather Twitter Bot For London Runners
+![Banner image](assets/twitter_banner_3.png)
 
 Twitter account: [@weather_to_run](https://twitter.com/weather_to_run)
 
