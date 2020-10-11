@@ -26,6 +26,8 @@ The following is a description of the automated processes performed by the Twitt
 Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled to be posted at 10pm (London time) 
 and follow the format outlined above.
 
+![Annotated weather dashboard](readme_images/annotated_dashboard.jpg)
+
 Each day is split up into segments, which by default are: morning, afternoon and evening. The aim of the daily tweet 
 is to rank these segments in running condition order. The time periods for each segment are set assuming the bot's
 followers work typical office hours and are therefore free to run outside of those hours. The segment time periods also
