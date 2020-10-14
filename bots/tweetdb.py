@@ -2,15 +2,11 @@ import psycopg2
 import os
 
 
-class tweetData:
+class TweetData:
     def __init__(self):
-        self.con = self.connect()
+        self.conn = self._connect()
 
-    def connect(self):
-        con = psycopg2.connect(database=os.getenv("DB_NAME"),
-                               user=os.getenv("DB_USER"),
-                               password=os.getenv("DB_PWD"),
-                               host=os.getenv("DB_HOST"),
-                               port=os.getenv("DB_PORT")
-                               )
-        return con
+    @staticmethod
+    def _connect():
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode='require')
+        return conn
