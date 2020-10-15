@@ -64,22 +64,7 @@ class TweetData:
     def remove_sentence(self, table, sentence):
         pass
 
-    def used_sentence(self, table, sentence_id):
-        records = self.session.query(table)
-        for record in records:
-            if record.primary_id == sentence_id:
-                record.uses += 1
-                record.used = True
-        self.session.commit()
-
-    def get_unused(self, table):
-        records = self.session.query(table)
-        for record in records:
-            if not record.used:
-                print(record.sentence)
-
     def choose_from_unused(self, table):
-        # records = self.session.query(table)
         all_unused_records = [record for record in self.session.query(table).filter(table.used==False)]
 
         # If there are some unused sentences...
@@ -93,9 +78,11 @@ class TweetData:
 
         # If there are no unused sentences, reset and repeat...
         else:
+            # Reset "used" column
             for record in self.session.query(table):
                 record.used = False
             self.session.commit()
+            # Recall method
             self.choose_from_unused(table)
 
     def _print_sentences(self, table):
