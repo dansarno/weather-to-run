@@ -89,10 +89,16 @@ class TweetDB:
         self.session.add(new_record)
         self.session.commit()
 
-    def edit_sentence(self, table, old_sentence, new_sentence):
-        pass
+    def edit_sentence(self, table, record_id, new_sentence):
+        record_to_edit = self.session.query(table).get(record_id)
+        if record_to_edit:
+            record_to_edit.sentence = new_sentence
+            self.session.commit()
+            print("Successful edit")
+        else:
+            raise ValueError
 
-    def remove_sentence(self, table, sentence):
+    def remove_sentence(self, table, record_id):
         pass
 
     def choose_from_unused(self, table, tone, n_selections=0):
