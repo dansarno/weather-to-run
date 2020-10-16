@@ -36,9 +36,9 @@ vary depending on the day of the week as follows:
 
 |           | Weekday     | Weekend     |
 |-----------|-------------|-------------|
-| Morning   | 06:00-10:00 | 06:00-12:00 |
-| Afternoon | 12:00-14:00 | 12:00-17:00 |
-| Evening   | 17:00-21:00 | 17:00-21:00 |
+| Morning   | 06:00 - 10:00 | 06:00 - 12:00 |
+| Afternoon | 12:00 - 14:00 | 12:00 - 17:00 |
+| Evening   | 17:00 - 21:00 | 17:00 - 21:00 |
 
 ### Auto-Reply
 
