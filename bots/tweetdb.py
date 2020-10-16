@@ -3,42 +3,49 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, synonym
+from sqlalchemy.orm import sessionmaker
 
 base = declarative_base()
 
 
-class Intro(base):
+class Content:
+    sentence = Column(Text)
+    tone = Column(VARCHAR(20))
+    used = Column(Boolean)
+    uses = Column(Integer)
+
+    def __init__(self, sentence, tone, used, uses):
+        self.sentence = sentence
+        self.tone = tone
+        self.used = used
+        self.uses = uses
+
+
+class Intro(base, Content):
     __tablename__ = 'intros'
 
     intros_id = Column(Integer, primary_key=True)
-    primary_id = synonym("intros_id")
-    sentence = Column(Text)
-    tone = Column(VARCHAR(20))
-    used = Column(Boolean)
-    uses = Column(Integer)
+
+    def __repr__(self):
+        return f'<Intro: "{self.sentence}">'
 
 
-class Forecast(base):
+class Forecast(base, Content):
     __tablename__ = 'forecasts'
 
     forecasts_id = Column(Integer, primary_key=True)
-    primary_id = synonym("forecasts_id")
-    sentence = Column(Text)
-    tone = Column(VARCHAR(20))
-    used = Column(Boolean)
-    uses = Column(Integer)
+
+    def __repr__(self):
+        return f'<Forecast: "{self.sentence}">'
 
 
-class Outro(base):
+class Outro(base, Content):
     __tablename__ = 'outros'
 
     outros_id = Column(Integer, primary_key=True)
-    primary_id = synonym("outros_id")
-    sentence = Column(Text)
-    tone = Column(VARCHAR(20))
-    used = Column(Boolean)
-    uses = Column(Integer)
+
+    def __repr__(self):
+        return f'<Outro: "{self.sentence}">'
 
 
 class TweetData:
