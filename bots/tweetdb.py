@@ -1,5 +1,6 @@
 import os
 import random
+import datetime
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -38,7 +39,7 @@ class Content:
         self.uses = uses
 
 
-class Intro(base, Content):
+class Intro(Content, base):
     __tablename__ = 'intros'
     intros_id = Column(Integer, primary_key=True)
 
@@ -46,15 +47,20 @@ class Intro(base, Content):
         return f'<Intro: "{self.sentence}">'
 
 
-class Forecast(base, Content):
+class Forecast(Content, base):
     __tablename__ = 'forecasts'
     forecasts_id = Column(Integer, primary_key=True)
+    n_selections = Column(Integer)
+
+    def __init__(self, sentence, tone, used, uses, n_selections):
+        super().__init__(sentence, tone, used, uses)
+        self.n_selections = n_selections
 
     def __repr__(self):
         return f'<Forecast: "{self.sentence}">'
 
 
-class Outro(base, Content):
+class Outro(Content, base):
     __tablename__ = 'outros'
     outros_id = Column(Integer, primary_key=True)
 
@@ -62,7 +68,7 @@ class Outro(base, Content):
         return f'<Outro: "{self.sentence}">'
 
 
-class TweetData:
+class TweetDB:
     def __init__(self):
         self.engine = None
         self.session = None
@@ -94,7 +100,7 @@ class TweetData:
             random_record.uses += 1
             self.session.commit()
             print(random_record.sentence)
-            # return random_record.sentence
+            return random_record
 
         # If there are no unused sentences, reset and repeat...
         else:
@@ -103,6 +109,17 @@ class TweetData:
             self.session.commit()
             # Recall method
             self.choose_from_unused(table, tone)
+
+    def form_tweet(self, tone):
+        intro = self.choose_from_unused(Intro, tone)
+        forecast = self.choose_from_unused(Forecast, tone)
+        outro = self.choose_from_unused(Outro, tone)
+
+        tweet = f"{intro.sentence} {forecast.sentence} {outro.sentence}"
+        print(tweet)
+        new_tweet = Tweet(datetime.datetime.now(), intro.intros_id, forecast.forecasts_id, outro.outros_id, tweet)
+        self.session.add(new_tweet)
+        self.session.commit()
 
     def _print_sentences(self, table):
         records = self.session.query(table)
