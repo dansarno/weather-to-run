@@ -65,11 +65,10 @@ class TweetData:
         pass
 
     def choose_from_unused(self, table):
-        all_unused_records = [record for record in self.session.query(table).filter_by(used=False)]
+        unused_records = self.session.query(table).filter_by(used=False).all()
 
-        # If there are some unused sentences...
-        if all_unused_records:
-            random_record = random.choice(all_unused_records)
+        if unused_records:
+            random_record = random.choice(unused_records)
             random_record.used = True
             random_record.uses += 1
             self.session.commit()
@@ -78,9 +77,8 @@ class TweetData:
 
         # If there are no unused sentences, reset and repeat...
         else:
-            # Reset "used" column
-            for record in self.session.query(table):
-                record.used = False
+            # Reset "used" column, i.e. set all to False
+            self.session.query(table).update({table.used: False})
             self.session.commit()
             # Recall method
             self.choose_from_unused(table)
