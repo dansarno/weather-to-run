@@ -139,3 +139,7 @@ class TweetDB:
         records = self.session.query(table)
         for record in records:
             print(record.sentence)
+
+    def _reset_table(self, table):
+        self.session.query(table).update({table.uses: 0, table.used: False})
+        self.session.commit()
