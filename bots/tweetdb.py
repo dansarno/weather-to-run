@@ -64,8 +64,8 @@ class TweetData:
     def remove_sentence(self, table, sentence):
         pass
 
-    def choose_from_unused(self, table):
-        unused_records = self.session.query(table).filter_by(used=False).all()
+    def choose_from_unused(self, table, tone):
+        unused_records = self.session.query(table).filter(table.used==False, table.tone==tone).all()
 
         if unused_records:
             random_record = random.choice(unused_records)
@@ -81,7 +81,7 @@ class TweetData:
             self.session.query(table).update({table.used: False})
             self.session.commit()
             # Recall method
-            self.choose_from_unused(table)
+            self.choose_from_unused(table, tone)
 
     def _print_sentences(self, table):
         records = self.session.query(table)
