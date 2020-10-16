@@ -31,12 +31,14 @@ class Content:
     tone = Column(VARCHAR(20))
     used = Column(Boolean)
     uses = Column(Integer)
+    deleted = Column(Boolean)
 
     def __init__(self, sentence, tone, used, uses):
         self.sentence = sentence
         self.tone = tone
         self.used = used
         self.uses = uses
+        self.deleted = False
 
 
 class Intro(Content, base):
@@ -99,15 +101,24 @@ class TweetDB:
             raise ValueError
 
     def remove_sentence(self, table, record_id):
-        pass
+        record_to_delete = self.session.query(table).get(record_id)
+        if record_to_delete:
+            record_to_delete.deleted = True
+            self.session.commit()
+            print("Successful deletion")
+        else:
+            raise ValueError
 
     def choose_from_unused(self, table, tone, n_selections=0):
         if n_selections:
             unused_records = self.session.query(table).filter(table.used==False,
+                                                              table.deleted==False,
                                                               table.tone==tone,
                                                               table.n_selections==n_selections).all()
         else:
-            unused_records = self.session.query(table).filter(table.used==False, table.tone==tone).all()
+            unused_records = self.session.query(table).filter(table.used==False,
+                                                              table.deleted == False,
+                                                              table.tone==tone).all()
 
         if unused_records:
             random_record = random.choice(unused_records)
@@ -117,9 +128,11 @@ class TweetDB:
 
         else:
             if n_selections:
-                q = self.session.query(table).filter(table.tone == tone, table.n_selections==n_selections)
+                q = self.session.query(table).filter(table.tone == tone,
+                                                     table.deleted == False,
+                                                     table.n_selections==n_selections)
             else:
-                q = self.session.query(table).filter(table.tone == tone)
+                q = self.session.query(table).filter(table.tone == tone, table.deleted==False)
             # Reset "used" column, i.e. set all to False
             q.update({table.used: False})
             records = q.all()
