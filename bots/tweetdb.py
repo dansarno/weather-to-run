@@ -80,8 +80,12 @@ class TweetDB:
         Session = sessionmaker(self.engine)
         self.session = Session()
 
-    def add_sentence(self, table, new_sentence, tone):
-        new_record = table(sentence=new_sentence, tone=tone, used=False, uses=0)
+    def add_sentence(self, table, new_sentence, tone, n_selections=0):
+        print(f'Adding "{new_sentence}"...')
+        if n_selections:
+            new_record = table(sentence=new_sentence, tone=tone, used=False, uses=0, n_selections=n_selections)
+        else:
+            new_record = table(sentence=new_sentence, tone=tone, used=False, uses=0)
         self.session.add(new_record)
         self.session.commit()
 
@@ -91,28 +95,38 @@ class TweetDB:
     def remove_sentence(self, table, sentence):
         pass
 
-    def choose_from_unused(self, table, tone):
-        unused_records = self.session.query(table).filter(table.used==False, table.tone==tone).all()
+    def choose_from_unused(self, table, tone, n_selections=0):
+        if n_selections:
+            unused_records = self.session.query(table).filter(table.used==False,
+                                                              table.tone==tone,
+                                                              table.n_selections==n_selections).all()
+        else:
+            unused_records = self.session.query(table).filter(table.used==False, table.tone==tone).all()
 
         if unused_records:
             random_record = random.choice(unused_records)
             random_record.used = True
             random_record.uses += 1
             self.session.commit()
-            print(random_record.sentence)
-            return random_record
 
-        # If there are no unused sentences, reset and repeat...
         else:
+            if n_selections:
+                q = self.session.query(table).filter(table.tone == tone, table.n_selections==n_selections)
+            else:
+                q = self.session.query(table).filter(table.tone == tone)
             # Reset "used" column, i.e. set all to False
-            self.session.query(table).update({table.used: False})
+            q.update({table.used: False})
+            records = q.all()
+            random_record = random.choice(records)
+            random_record.used = True
+            random_record.uses += 1
             self.session.commit()
-            # Recall method
-            self.choose_from_unused(table, tone)
 
-    def form_tweet(self, tone):
+        return random_record
+
+    def form_tweet(self, tone, n_selections):
         intro = self.choose_from_unused(Intro, tone)
-        forecast = self.choose_from_unused(Forecast, tone)
+        forecast = self.choose_from_unused(Forecast, tone, n_selections)
         outro = self.choose_from_unused(Outro, tone)
 
         tweet = f"{intro.sentence} {forecast.sentence} {outro.sentence}"
