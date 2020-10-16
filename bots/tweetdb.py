@@ -65,7 +65,7 @@ class TweetData:
         pass
 
     def choose_from_unused(self, table):
-        all_unused_records = [record for record in self.session.query(table).filter(table.used==False)]
+        all_unused_records = [record for record in self.session.query(table).filter_by(used=False)]
 
         # If there are some unused sentences...
         if all_unused_records:
