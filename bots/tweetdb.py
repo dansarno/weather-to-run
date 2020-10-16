@@ -1,11 +1,28 @@
 import os
 import random
-from sqlalchemy import create_engine
-from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR
+from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 base = declarative_base()
+
+
+class Tweet(base):
+    __tablename__ = 'tweets'
+    tweets_id = Column(Integer, primary_key=True)
+    date_posted = Column(DateTime)
+    intros_id = Column(Integer, ForeignKey('intros.intros_id'))
+    forecasts_id = Column(Integer, ForeignKey('forecasts.forecasts_id'))
+    outros_id = Column(Integer, ForeignKey('outros.outros_id'))
+    sentence = Column(Text)
+
+    def __init__(self, date_posted, intros_id, forecasts_id, outros_id, sentence):
+        self.date_posted = date_posted
+        self.intros_id = intros_id
+        self.forecasts_id = forecasts_id
+        self.outros_id = outros_id
+        self.sentence = sentence
 
 
 class Content:
@@ -23,7 +40,6 @@ class Content:
 
 class Intro(base, Content):
     __tablename__ = 'intros'
-
     intros_id = Column(Integer, primary_key=True)
 
     def __repr__(self):
@@ -32,7 +48,6 @@ class Intro(base, Content):
 
 class Forecast(base, Content):
     __tablename__ = 'forecasts'
-
     forecasts_id = Column(Integer, primary_key=True)
 
     def __repr__(self):
@@ -41,7 +56,6 @@ class Forecast(base, Content):
 
 class Outro(base, Content):
     __tablename__ = 'outros'
-
     outros_id = Column(Integer, primary_key=True)
 
     def __repr__(self):
