@@ -25,6 +25,9 @@ class Tweet(base):
         self.outros_id = outros_id
         self.sentence = sentence
 
+    def __repr__(self):
+        return f'<Tweet: "{self.sentence}">'
+
 
 class Content:
     sentence = Column(Text, nullable=False)
@@ -117,7 +120,7 @@ class TweetDB:
                                                               table.n_selections==n_selections).all()
         else:
             unused_records = self.session.query(table).filter(table.used==False,
-                                                              table.deleted == False,
+                                                              table.deleted==False,
                                                               table.tone==tone).all()
 
         if unused_records:
@@ -143,6 +146,11 @@ class TweetDB:
 
         return random_record
 
+    def add_tweet(self, intro, forecast, outro, tweet, date=datetime.datetime.now()):
+        new_tweet = Tweet(date, intro.intros_id, forecast.forecasts_id, outro.outros_id, tweet)
+        self.session.add(new_tweet)
+        self.session.commit()
+
     def form_tweet(self, tone, n_selections):
         intro = self.choose_from_unused(Intro, tone)
         forecast = self.choose_from_unused(Forecast, tone, n_selections)
@@ -161,4 +169,10 @@ class TweetDB:
 
     def _reset_table(self, table):
         self.session.query(table).update({table.uses: 0, table.used: False})
+        self.session.commit()
+
+    def _clear_table(self, table):
+        all_records = self.session.query(table).all()
+        for record in all_records:
+            self.session.delete(record)
         self.session.commit()

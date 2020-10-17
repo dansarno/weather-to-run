@@ -1,5 +1,6 @@
 from config import TweetConfig
 import yaml
+from bots.tweetdb import TweetDB, Intro, Forecast, Outro
 import random
 import re
 
@@ -49,20 +50,46 @@ def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
     Returns:
         Full tweet string
     """
-    intro_text = random.choice(templates_dict['Intro'][tone])
-    selection_text = random.choice(templates_dict[f'Selection text {len(selections)}'][tone])
-    outro_text = random.choice(templates_dict['Outro'][tone])
 
-    selection_text = add_selections_to_tweet(selection_text, selections)
+    if config.CONTENT_SOURCE == "yaml":
+        intro_text = random.choice(templates_dict['Intro'][tone])
+        selection_text = random.choice(templates_dict[f'Selection text {len(selections)}'][tone])
+        outro_text = random.choice(templates_dict['Outro'][tone])
+        selection_text = add_selections_to_tweet(selection_text, selections)
 
-    tweet_composition = []
-    if random.random() < config.PROB_OF_INTRO:
-        tweet_composition.append(intro_text)
-    tweet_composition.append(selection_text)
-    if random.random() < config.PROB_OF_OUTRO:
-        tweet_composition.append(outro_text)
+        tweet_composition = []
+        if random.random() < config.PROB_OF_INTRO:
+            tweet_composition.append(intro_text)
+        tweet_composition.append(selection_text)
+        if random.random() < config.PROB_OF_OUTRO:
+            tweet_composition.append(outro_text)
 
-    return " ".join(tweet_composition)
+        return " ".join(tweet_composition)
+
+    elif config.CONTENT_SOURCE == "database":
+        db = TweetDB()
+
+        intro = db.choose_from_unused(Intro, tone.lower())
+        forecast = db.choose_from_unused(Forecast, tone.lower(), len(selections))
+        outro = db.choose_from_unused(Outro, tone.lower())
+
+        # Add selections fot text
+        forecast_text = add_selections_to_tweet(forecast.sentence, selections)
+
+        tweet_composition = []
+        if random.random() < config.PROB_OF_INTRO:
+            tweet_composition.append(intro.sentence)
+        tweet_composition.append(forecast_text)
+        if random.random() < config.PROB_OF_OUTRO:
+            tweet_composition.append(outro.sentence)
+
+        tweet_text = " ".join(tweet_composition)
+        db.add_tweet(intro, forecast, outro, tweet_text)
+
+        return tweet_text
+
+    else:
+        raise ValueError
 
 
 if __name__ == "__main__":

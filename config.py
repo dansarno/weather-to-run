@@ -24,6 +24,7 @@ class TweetConfig:
     AUTO_REPLY_SCHEDULE = schedule.every(15).seconds
     FOLLOW_BACK_SCHEDULE = schedule.every(10).minutes
     DAILY_TWEET_SCHEDULE = schedule.every().day.at("22:00")
+    CONTENT_SOURCE = "database"  # yaml or database
 
 
 class DisplayConfig:
