@@ -1,12 +1,12 @@
 from opencage.geocoder import OpenCageGeocode
 import logging
-import os
 import datetime
 import tweepy
 from geotext import GeoText
 from weather import forecast
 from weather import day_weather
 from bots import tweet_composer
+from config import CredentialsConfig
 
 
 logging.getLogger('schedule').propagate = False
@@ -23,9 +23,8 @@ logger.addHandler(stream_handler)
 
 
 def create_geocoder_obj():
-    """Reads authentication credentials from environment variables and creates the geocoder API object"""
-    geocoder_api_key = os.getenv("GEOCODER_API_KEY")
-    return OpenCageGeocode(geocoder_api_key)
+    """Reads authentication credentials from config and creates the geocoder API object"""
+    return OpenCageGeocode(CredentialsConfig.GEOCODER_API_KEY)
 
 
 def text_to_location(tweet_text):

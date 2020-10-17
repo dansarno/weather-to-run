@@ -1,6 +1,7 @@
-import os
 import numpy as np
 import requests
+from config import DisplayConfig
+from config import CredentialsConfig
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.ticker import MultipleLocator
@@ -8,7 +9,6 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from scipy.interpolate import interp1d
 import scipy.ndimage
 import matplotlib.image as mpimg
-from config import DisplayConfig
 
 
 def fetch_forecast(location):
@@ -24,7 +24,7 @@ def fetch_forecast(location):
 
     """
 
-    api_key = os.getenv("OPENWEATHER_API_KEY")
+    api_key = CredentialsConfig.OPENWEATHER_API_KEY
 
     lat, lon = list(location.values())[0]
     url = (f"https://api.openweathermap.org/data/2.5/onecall?"

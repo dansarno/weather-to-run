@@ -1,13 +1,29 @@
 import os
 import datetime
+import schedule
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+class CredentialsConfig:
+    # Weather
+    OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+    # Geocoder
+    GEOCODER_API_KEY = os.getenv("GEOCODER_API_KEY")
+    # Twitter
+    TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
+    TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
+    TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+    TWITTER_TOKEN_SECRET = os.getenv("TWITTER_TOKEN_SECRET")
 
 
 class TweetConfig:
     PROB_OF_INTRO = 0.75
     PROB_OF_OUTRO = 0.75
     HASHTAG = "myweather"
+    AUTO_REPLY_SCHEDULE = schedule.every(15).seconds
+    FOLLOW_BACK_SCHEDULE = schedule.every(10).minutes
+    DAILY_TWEET_SCHEDULE = schedule.every().day.at("22:00")
 
 
 class DisplayConfig:
