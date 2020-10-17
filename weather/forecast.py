@@ -8,7 +8,7 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from scipy.interpolate import interp1d
 import scipy.ndimage
 import matplotlib.image as mpimg
-from weather import dashboard_colours as colours
+from config import DisplayConfig
 
 
 def fetch_forecast(location):
@@ -62,22 +62,22 @@ def _add_dashboard_text_to_figure(fig_handle, day_obj, preferences):
     fig_handle.text(0.045, 0.9, "Weather to run or bot".upper(), color='white', fontsize=18, fontweight='bold')
     fig_handle.text(0.52, 0.9, f"{day_obj.date:%d.%m.%y}", color='white', fontsize=18, fontweight='ultralight')
 
-    fig_handle.text(0.05, 0.8, "LOCATION:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.17, 0.8, f"{list(day_obj.location.keys())[0].upper()}", color=colours.info_text, fontsize=12)
-    fig_handle.text(0.05, 0.75, "SUNRISE:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.17, 0.75, f"{day_obj.sunrise:%H:%M}", color=colours.info_text, fontsize=12)
-    fig_handle.text(0.05, 0.7, "SUNSET:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.17, 0.7, f"{day_obj.sunset:%H:%M}", color=colours.info_text, fontsize=12)
-    fig_handle.text(0.35, 0.8, "BEST OPTION:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.55, 0.8, f"{preferences[0].upper()}", color=colours.info_text, fontsize=12)
-    fig_handle.text(0.35, 0.75, "BACKUP OPTION:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.55, 0.75, f"{preferences[1].upper()}", color=colours.info_text, fontsize=12)
-    fig_handle.text(0.35, 0.7, "FINAL OPTION:", color=colours.info_field, fontsize=12)
-    fig_handle.text(0.55, 0.7, f"{preferences[2].upper()}", color=colours.info_text, fontsize=12)
+    fig_handle.text(0.05, 0.8, "LOCATION:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.17, 0.8, f"{list(day_obj.location.keys())[0].upper()}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    fig_handle.text(0.05, 0.75, "SUNRISE:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.17, 0.75, f"{day_obj.sunrise:%H:%M}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    fig_handle.text(0.05, 0.7, "SUNSET:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.17, 0.7, f"{day_obj.sunset:%H:%M}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    fig_handle.text(0.35, 0.8, "BEST OPTION:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.55, 0.8, f"{preferences[0].upper()}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    fig_handle.text(0.35, 0.75, "BACKUP OPTION:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.55, 0.75, f"{preferences[1].upper()}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    fig_handle.text(0.35, 0.7, "FINAL OPTION:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    fig_handle.text(0.55, 0.7, f"{preferences[2].upper()}", color=DisplayConfig.INFO_TEXT, fontsize=12)
 
 
 def _configure_main_dashboard_plot(ax_handle):
-    ax_handle.set_facecolor(colours.background)
+    ax_handle.set_facecolor(DisplayConfig.BACKGROUND)
     ax_handle.xaxis.set_major_locator(MultipleLocator(1))
     ax_handle.yaxis.set_major_locator(MultipleLocator(1))
     ax_handle.set_ylim([1, 10.5])
@@ -97,7 +97,7 @@ def _add_maxed(fig_handle, pos, asset_file):
     ax_max.imshow(im_max)
     ax_max.xaxis.set_visible(False)
     ax_max.yaxis.set_visible(False)
-    ax_max.set_facecolor(colours.background)
+    ax_max.set_facecolor(DisplayConfig.BACKGROUND)
     ax_max.spines['right'].set_visible(False)
     ax_max.spines['left'].set_visible(False)
     ax_max.spines['bottom'].set_visible(False)
@@ -116,8 +116,8 @@ def _plot_dial(fig_handle, ax_handle, val, max_val, maxed_pos, maxed_asset, icon
     else:  # only valid for temperature where a negative value is possible
         groups = [abs(val) / max_val, 1 - abs(val) / max_val]
         ccw = True
-    ax_handle.pie(groups, colors=[dial_colour, colours.segments], startangle=90, counterclock=ccw)
-    my_circle = plt.Circle((0, 0), 0.7, color=colours.background)
+    ax_handle.pie(groups, colors=[dial_colour, DisplayConfig.SEGMENTS], startangle=90, counterclock=ccw)
+    my_circle = plt.Circle((0, 0), 0.7, color=DisplayConfig.BACKGROUND)
     ax_handle.add_artist(my_circle)
     im_icon = mpimg.imread(icon_asset)
     icon = OffsetImage(im_icon, zoom=0.18)
@@ -126,12 +126,12 @@ def _plot_dial(fig_handle, ax_handle, val, max_val, maxed_pos, maxed_asset, icon
 
 
 def _add_dial_text(ax_handle, morn_param, aft_param, eve_param, unit):
-    ax_handle.text(1.3, 0.4, "M:", color=colours.info_field, fontsize=12)
-    ax_handle.text(1.8, 0.4, f"{morn_param:.1f}{unit}", color=colours.info_text, fontsize=12)
-    ax_handle.text(1.3, -0.2, "A:", color=colours.info_field, fontsize=12)
-    ax_handle.text(1.8, -0.2, f"{aft_param:.1f}{unit}", color=colours.info_text, fontsize=12)
-    ax_handle.text(1.3, -0.8, "E:", color=colours.info_field, fontsize=12)
-    ax_handle.text(1.8, -0.8, f"{eve_param:.1f}{unit}", color=colours.info_text, fontsize=12)
+    ax_handle.text(1.3, 0.4, "M:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    ax_handle.text(1.8, 0.4, f"{morn_param:.1f}{unit}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    ax_handle.text(1.3, -0.2, "A:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    ax_handle.text(1.8, -0.2, f"{aft_param:.1f}{unit}", color=DisplayConfig.INFO_TEXT, fontsize=12)
+    ax_handle.text(1.3, -0.8, "E:", color=DisplayConfig.INFO_FIELD, fontsize=12)
+    ax_handle.text(1.8, -0.8, f"{eve_param:.1f}{unit}", color=DisplayConfig.INFO_TEXT, fontsize=12)
 
 
 def plot_scores(day, rankings, to_show, filename):
@@ -151,7 +151,7 @@ def plot_scores(day, rankings, to_show, filename):
     fig = plt.figure("Weather Dashboard", figsize=(8, 4.5))  # 16 x 9 aspect ratio for twitter
     gs = fig.add_gridspec(nrows=3, ncols=4, left=0.08, bottom=0.12, top=0.95)
     gs.update(wspace=-0.1)
-    fig.patch.set_facecolor(colours.background)
+    fig.patch.set_facecolor(DisplayConfig.BACKGROUND)
 
     _add_dashboard_text_to_figure(fig, day, rankings)
 
@@ -160,7 +160,7 @@ def plot_scores(day, rankings, to_show, filename):
     for name, seg in day.segments.items():
         rect_width = seg.duration + 0.9
         x = seg.start_time.hour
-        rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor=colours.segments)
+        rect = patches.Rectangle((x, 1), rect_width, 9, edgecolor='none', facecolor=DisplayConfig.SEGMENTS)
         ax.add_patch(rect)
 
         ax.text(((seg.end_time.hour + seg.start_time.hour) / 2) + 0.2,
@@ -175,16 +175,16 @@ def plot_scores(day, rankings, to_show, filename):
 
     _configure_main_dashboard_plot(ax)
 
-    ax.plot(time, temp + 1, color=colours.temp, linewidth=4.0, zorder=5)
-    ax.plot(time, wind + 1, color=colours.wind, linewidth=4.0, zorder=5)
-    ax.plot(time, precip + 1, color=colours.precip, linewidth=4.0, zorder=5)
+    ax.plot(time, temp + 1, color=DisplayConfig.TEMP, linewidth=4.0, zorder=5)
+    ax.plot(time, wind + 1, color=DisplayConfig.WIND, linewidth=4.0, zorder=5)
+    ax.plot(time, precip + 1, color=DisplayConfig.PRECIP, linewidth=4.0, zorder=5)
 
     # DASHBOARD DIALS
     # Temperature Dial
     ax_temp = fig.add_subplot(gs[0, -1])
     max_temp = 40  # degrees C
     _plot_dial(fig, ax_temp, day.temp_c, max_temp, [0.77, 0.925, 0.04, 0.04],
-               'assets/maxed_temp.png', 'assets/therm.png', colours.temp)
+               'assets/maxed_temp.png', 'assets/therm.png', DisplayConfig.TEMP)
     _add_dial_text(ax_temp, day.segments['morning'].temp_c, day.segments['afternoon'].temp_c,
                    day.segments['evening'].temp_c, "°C")
 
@@ -192,7 +192,7 @@ def plot_scores(day, rankings, to_show, filename):
     ax_wind = fig.add_subplot(gs[1, -1])
     max_wind = 30  # mps
     _plot_dial(fig, ax_wind, day.wind_mps, max_wind, [0.77, 0.634, 0.04, 0.04],
-               'assets/maxed_wind.png', 'assets/wind.png', colours.wind)
+               'assets/maxed_wind.png', 'assets/wind.png', DisplayConfig.WIND)
     _add_dial_text(ax_wind, day.segments['morning'].wind_mps, day.segments['afternoon'].wind_mps,
                    day.segments['evening'].wind_mps, "m/s")
 
@@ -200,7 +200,7 @@ def plot_scores(day, rankings, to_show, filename):
     ax_precip = fig.add_subplot(gs[2, -1])
     max_precip = 20  # mm
     _plot_dial(fig, ax_precip, day.precipitation_mm, max_precip, [0.77, 0.34, 0.04, 0.04],
-               'assets/maxed_precip.png', 'assets/drop.png', colours.precip)
+               'assets/maxed_precip.png', 'assets/drop.png', DisplayConfig.PRECIP)
     _add_dial_text(ax_precip, day.segments['morning'].precipitation_mm, day.segments['afternoon'].precipitation_mm,
                    day.segments['evening'].precipitation_mm, "mm")
 

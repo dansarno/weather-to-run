@@ -1,4 +1,4 @@
-from bots import tweet_config as config
+from config import TweetConfig
 import yaml
 import random
 import re
@@ -33,18 +33,18 @@ def get_tweet_templates(yaml_filename="tweet_content.yaml"):
     return templates_dict
 
 
-def compose_tweet(selections, tone, templates_dict, config=config):
+def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
     """Forms a full tweet given segment preferences and an overall tone of the tweet.
 
     Full tweets are comprised of an intro, a weather sentence and an outro. The intros and outros have a less
-    than 100% chance of being included in the tweet (determined by tweet_config). The tweet components are randomly
+    than 100% chance of being included in the tweet (determined by tweet_TweetConfig). The tweet components are randomly
     selected from the tweet content yaml file give a tone
 
     Args:
         selections (list): A list of the names of the segments of the day (in preference order)
         tone (str): Equivalent to alert level of the weather for the day (green, amber, red)
         templates_dict (dict): A dictionary of template sentences
-        config (object): Module containing probably constants for intros and outros
+        config (class): Class containing probably constants for intros and outros
 
     Returns:
         Full tweet string
@@ -72,5 +72,5 @@ if __name__ == "__main__":
     templates = get_tweet_templates()
 
     for _ in range(100):
-        a_tweet = compose_tweet(results, level, templates, config)
+        a_tweet = compose_tweet(results, level, templates)
         print(a_tweet)

@@ -1,7 +1,8 @@
 import logging
 import schedule
+import config
 from bots import bot_state
-from bots import config
+from bots import twitter_api
 from bots import auto_reply_bot
 from bots import daily_tweet_bot
 from bots import followback_bot
@@ -21,16 +22,16 @@ logger.addHandler(stream_handler)
 
 if __name__ == "__main__":
 
-    tag = "myweather"  # trigger hashtag
+    tag = config.TweetConfig.HASHTAG  # trigger hashtag
 
     # Create API object
-    api = config.create_api()
+    api = twitter_api.create_api()
     # Create Profile object
     bot_account = bot_state.TwitterProfile(api)
 
-    # daily_tweet_bot.daily_tweet(api, "new", debug=True)
-    schedule.every(15).seconds.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
-    schedule.every(10).minutes.do(followback_bot.follow_back, api, bot_account)
-    schedule.every().day.at("22:00").do(daily_tweet_bot.daily_tweet, api, "new")
-    while True:
-        schedule.run_pending()
+    daily_tweet_bot.daily_tweet(api, "new", debug=True)
+    # schedule.every(15).seconds.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
+    # schedule.every(10).minutes.do(followback_bot.follow_back, api, bot_account)
+    # schedule.every().day.at("22:00").do(daily_tweet_bot.daily_tweet, api, "new")
+    # while True:
+    #     schedule.run_pending()

@@ -1,4 +1,4 @@
-from weather import config
+from config import WeatherConfig
 from weather import forecast
 import datetime
 
@@ -44,7 +44,7 @@ class TimeElement:
         score = 10 - ((self.wind_mps ** (7 / 6)) / 6)
         self.wind_score = round(min(max(score, 0), 9), 1)
 
-    def precipitation_to_score(self, precip_scores_dict=config.PRECIPITATION_SCORES):
+    def precipitation_to_score(self, precip_scores_dict=WeatherConfig.PRECIPITATION_SCORES):
         """Empirical mapping of precipitation types to a score (9-best, 0-worst)."""
         self.precipitation_score = precip_scores_dict[self.precipitation_type]
 
@@ -86,7 +86,7 @@ class TimePeriod(TimeElement):
             else:
                 print(f'Aggregate score method "{method}" not recognised')  # Need to raise an error here instead
 
-    def set_alert_level(self, bands=config.ALERT_BANDS):
+    def set_alert_level(self, bands=WeatherConfig.ALERT_BANDS):
         """Sets the alert level attribute for this TimePeriod based off the worst score of any of the weather params.
 
         Args:
@@ -121,7 +121,7 @@ class Day(TimePeriod):
         segments (dict): Segment names (keys) and the Segment objects (values)
 
     """
-    def __init__(self, date, segments=config.TIME_WINDOWS, location=config.LOCATION):
+    def __init__(self, date, segments=WeatherConfig.TIME_WINDOWS, location=WeatherConfig.LOCATION):
         super().__init__()
         self.sunrise = 0
         self.sunset = 0
