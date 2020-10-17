@@ -27,11 +27,11 @@ class Tweet(base):
 
 
 class Content:
-    sentence = Column(Text)
-    tone = Column(VARCHAR(20))
-    used = Column(Boolean)
-    uses = Column(Integer)
-    deleted = Column(Boolean)
+    sentence = Column(Text, nullable=False)
+    tone = Column(VARCHAR(20), nullable=False)
+    used = Column(Boolean, nullable=False, default=False)
+    uses = Column(Integer, nullable=False, default=0)
+    deleted = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, sentence, tone, used, uses):
         self.sentence = sentence
@@ -52,7 +52,7 @@ class Intro(Content, base):
 class Forecast(Content, base):
     __tablename__ = 'forecasts'
     forecasts_id = Column(Integer, primary_key=True)
-    n_selections = Column(Integer)
+    n_selections = Column(Integer, nullable=False)
 
     def __init__(self, sentence, tone, used, uses, n_selections):
         super().__init__(sentence, tone, used, uses)
