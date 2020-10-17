@@ -32,8 +32,8 @@ class DisplayConfig:
     TEMP = '#f30a49'
     WIND = '#29c7ac'
     PRECIP = '#46b5d1'
-    INFO_FIELD = '#7691ad'
-    INFO_TEXT = '#466482'
+    INFO_FIELD = '#b0c4d9'
+    INFO_TEXT = '#7691ad'
 
 
 class WeatherConfig:
