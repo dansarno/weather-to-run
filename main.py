@@ -29,9 +29,9 @@ if __name__ == "__main__":
     # Create Profile object
     bot_account = bot_state.TwitterProfile(api)
 
-    daily_tweet_bot.daily_tweet(api, "new", debug=True)
-    # TweetConfig.AUTO_REPLY_SCHEDULE.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
-    # TweetConfig.FOLLOW_BACK_SCHEDULE.do(followback_bot.follow_back, api, bot_account)
-    # TweetConfig.DAILY_TWEET_SCHEDULE.do(daily_tweet_bot.daily_tweet, api, "new")
-    # while True:
-    #     schedule.run_pending()
+    # daily_tweet_bot.daily_tweet(api, "new", debug=True)
+    TweetConfig.AUTO_REPLY_SCHEDULE.do(auto_reply_bot.reply_to_mentions, bot_account, api, tag)
+    TweetConfig.FOLLOW_BACK_SCHEDULE.do(followback_bot.follow_back, api, bot_account)
+    TweetConfig.DAILY_TWEET_SCHEDULE.do(daily_tweet_bot.daily_tweet, api, "new")
+    while True:
+        schedule.run_pending()

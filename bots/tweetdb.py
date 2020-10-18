@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from config import TweetConfig
 
 base = declarative_base()
 
@@ -73,7 +74,7 @@ class Outro(Content, base):
 
 
 class TweetDB:
-    def __init__(self, db_uri):
+    def __init__(self, db_uri=TweetConfig.DB_URI):
         self.engine = None
         self.session = None
 

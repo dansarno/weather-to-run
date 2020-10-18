@@ -135,7 +135,6 @@ def tweet_your_weather(location, offset):
             f"_{your_tomorrow.date.strftime('%d-%m-%y')}.jpg"
     forecast.plot_scores(your_tomorrow, order, to_show=False, filename=fname)
 
-    tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
-    tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
+    tweet_text = tweet_composer.compose_tweet(choices, tone)
 
     return tweet_text, fname

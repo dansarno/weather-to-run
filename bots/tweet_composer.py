@@ -34,7 +34,7 @@ def get_tweet_templates(yaml_filename="../data/tweet_content.yaml"):
     return templates_dict
 
 
-def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
+def compose_tweet(selections, tone, config=TweetConfig):
     """Forms a full tweet given segment preferences and an overall tone of the tweet.
 
     Full tweets are comprised of an intro, a weather sentence and an outro. The intros and outros have a less
@@ -44,7 +44,6 @@ def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
     Args:
         selections (list): A list of the names of the segments of the day (in preference order)
         tone (str): Equivalent to alert level of the weather for the day (green, amber, red)
-        templates_dict (dict): A dictionary of template sentences
         config (class): Class containing probably constants for intros and outros
 
     Returns:
@@ -52,6 +51,7 @@ def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
     """
 
     if config.CONTENT_SOURCE == "yaml":
+        templates_dict = get_tweet_templates()
         intro_text = random.choice(templates_dict['Intro'][tone])
         selection_text = random.choice(templates_dict[f'Selection text {len(selections)}'][tone])
         outro_text = random.choice(templates_dict['Outro'][tone])
