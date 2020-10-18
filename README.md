@@ -97,6 +97,51 @@ Concrete classes for DaySegment and Day inherit from TimePeriod and add the fina
 and methods of those periods of time. For example, the Day class uniquely has the attributes sunset and sunrise
 time.
 
+TimePeriods also have the attribute "alert level". This is a discretisation and simplified categorisation of the 
+time-varying scores for each weather parameter. These three levels are:
+- Green - good weather
+- Amber - not the best but manageable weather
+- Red - bad weather
+
 ### Tweet Generator
 
+Very simple text summary using the outputs of weather scoring, "alert level" assessment and day segment ranking.
+Tweets are formed from pre-written components/templates stored in a PostgreSQL database provided by Heroku.
+
+Each tweet status has three possible components:
+- Introduction
+- Forecast
+- Outro/Sign-off
+
+Note: Introductions and outro's are not always a component of the tweet. They have some <100% percentage chance of 
+inclusion, defined in the configurations. The purpose of this behaviour is to provide additional randomness.
+
+Each tweet component is further subdivided by it's "tone". These tones mirror the alert levels outlined above. For 
+example, pre-written introduction components could be "Hey there", "Tricky one this" or "Eeeeek..." based off the alert
+level for the day's weather being green, amber or red, respectively.
+
+Forecast text templates (also classified by tone) have placeholder words which are substituted for by the day segment
+names ("morning", "afternoon", "evening") when the tweet is composed. For example, a forecast component, with a tone of 
+"green" and number of selections as 2, is "According to my sources, the weather is looking good for A(N) NOUN or NOUN 
+run." The placeholder words here are "NOUN" and "A(N)". The number of selections property is used when there are 
+multiple day segments with the same alert level.
+
+In addition to storing the tweet components, the PostgreSQL database is used to track the number of times each component
+has been used and the tweets that they form. This is to provide a greater sense of randomness to the tweets. By
+tracking which components have and have not been used, subsequent tweets can only be formed from components which
+are yet to be used. This makes the chance that a tweet, or any of its components, cropping up in consecutive tweets 
+nearly impossible. Once all tweet components of a particularly type have been used, the "used" column resets all to
+False and all of those components are free to be used again.
+
+##### Future Development
+In the future, it would be nice to experiment with natural-language generation (NLG) to form the bot's tweet messages.
+
 ### Heroku Deployment
+
+This twitter bot is deployed on Heroku as a continuously running worker dyno. The periodic actions/processes performed
+by this bot are:
+- Check for @ mentions to the bot's account every 15 seconds... and auto-reply if to the new mentions if found
+- Check for new followers to the bot's account every 10 minutes... and follow back new followers if found
+- Post daily tweet at 10pm bot local time
+
+The deployment method is "automatic deploys" via the master branch of this GitHub repository.
