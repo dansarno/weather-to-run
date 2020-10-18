@@ -1,4 +1,3 @@
-import os
 import random
 import datetime
 from sqlalchemy import create_engine, ForeignKey
@@ -74,14 +73,14 @@ class Outro(Content, base):
 
 
 class TweetDB:
-    def __init__(self):
+    def __init__(self, db_uri):
         self.engine = None
         self.session = None
 
-        self.connect()
+        self.connect(db_uri)
 
-    def connect(self):
-        self.engine = create_engine(os.getenv("PG_DB_URI"))
+    def connect(self, db_uri):
+        self.engine = create_engine(db_uri)
         Session = sessionmaker(self.engine)
         self.session = Session()
 

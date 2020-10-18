@@ -86,18 +86,24 @@ class TimePeriod(TimeElement):
             else:
                 print(f'Aggregate score method "{method}" not recognised')  # Need to raise an error here instead
 
-    def set_alert_level(self, bands=WeatherConfig.ALERT_BANDS):
+    def set_alert_level(self, method="average", bands=WeatherConfig.ALERT_BANDS):
         """Sets the alert level attribute for this TimePeriod based off the worst score of any of the weather params.
 
         Args:
+            method (str): The method of score aggregation used before alert level assessment
             bands (dict): The upper and lower score bands of the alert levels (green, amber, red)
         """
-        worst_alert_level = ""
-        worst_score = self.calc_worst_score()
+        alert_level = ""
+        if method == "worst":
+            score = self.calc_worst_score()
+        elif method == "average":
+            score = self.calc_average_score()
+        else:
+            raise ValueError
         for alert_name, band_limits in bands.items():
-            if band_limits[0] <= round(worst_score, 1) <= band_limits[1]:
-                worst_alert_level = alert_name
-        self.alert_level = worst_alert_level
+            if band_limits[0] <= round(score, 1) <= band_limits[1]:
+                alert_level = alert_name
+        self.alert_level = alert_level
 
     def calc_worst_score(self):
         """Calculate what, of all of the weather parameters, is the worst score."""

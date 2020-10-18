@@ -27,7 +27,7 @@ def add_selections_to_tweet(tweet_text, selections):
     return text_with_selection
 
 
-def get_tweet_templates(yaml_filename="tweet_content.yaml"):
+def get_tweet_templates(yaml_filename="../data/tweet_content.yaml"):
     """Read the tweet content yaml file and return a dictionary of template sentences to be formed into tweets"""
     with open(yaml_filename, 'r', encoding="utf8") as f:
         templates_dict = yaml.load(f, Loader=yaml.FullLoader)
@@ -67,7 +67,7 @@ def compose_tweet(selections, tone, templates_dict, config=TweetConfig):
         return " ".join(tweet_composition)
 
     elif config.CONTENT_SOURCE == "database":
-        db = TweetDB()
+        db = TweetDB(config.DB_URI)
 
         intro = db.choose_from_unused(Intro, tone.lower())
         forecast = db.choose_from_unused(Forecast, tone.lower(), len(selections))

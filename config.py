@@ -25,6 +25,7 @@ class TweetConfig:
     FOLLOW_BACK_SCHEDULE = schedule.every(10).minutes
     DAILY_TWEET_SCHEDULE = schedule.every().day.at("22:00")
     CONTENT_SOURCE = "database"  # yaml or database
+    DB_URI = os.getenv("PG_DB_URI")
 
 
 class DisplayConfig:
