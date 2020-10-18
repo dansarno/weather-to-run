@@ -50,7 +50,7 @@ def text_to_location(tweet_text):
         offset = result[0]["annotations"]["timezone"]["offset_sec"]
         return {city_str: (result[0]["geometry"]["lat"], result[0]["geometry"]["lng"])}, offset
     else:
-        return None
+        return None, None
 
 
 def reply_to_mentions(bot, api_obj, hashtag_str):
