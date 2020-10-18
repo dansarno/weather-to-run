@@ -18,7 +18,7 @@ Status Update:
 
 Media:
 
-![Example of a weather dashboard](readme_images/dashboard_18-10-20.jpg)
+![Example of a weather dashboard](dashboards/readme_images/dashboard_18-10-20.jpg)
 
 ## Automation
 The following is a description of the automated processes performed by the Twitter bot.
@@ -27,7 +27,7 @@ The following is a description of the automated processes performed by the Twitt
 Tweets when it thinks the best time to run is tomorrow. These tweets are scheduled to be posted at 10pm (London time) 
 and follow the format outlined above.
 
-![Annotated weather dashboard](readme_images/annotated_dashboard.jpg)
+![Annotated weather dashboard](dashboards/readme_images/annotated_dashboard.jpg)
 
 Each day is split up into segments, which by default are: morning, afternoon and evening. The aim of the daily tweet 
 is to rank these segments in running condition order. The time periods for each segment are set assuming the bot's
@@ -56,7 +56,7 @@ Reply: "[@weather_to_run](https://twitter.com/weather_to_run) #myweather Houston
 
 Bot response: "\[Incoming Alert\] The morning is best for a run, that's my best guess... I say go for it"
 
-![Examples of auto-reply dashboard](readme_images/auto_reply_demo.gif)
+![Examples of auto-reply dashboard](dashboards/readme_images/auto_reply_demo.gif)
 
 ### Follow Back
 
