@@ -18,7 +18,7 @@ Status Update:
 
 Media:
 
-![Example of a weather dashboard](readme_images/dashboard_23-09-20.jpg)
+![Example of a weather dashboard](readme_images/dashboard_18-10-20.jpg)
 
 ## Automation
 The following is a description of the automated processes performed by the Twitter bot.

@@ -1,10 +1,10 @@
-import os
 import random
 import datetime
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from config import TweetConfig
 
 base = declarative_base()
 
@@ -25,18 +25,23 @@ class Tweet(base):
         self.outros_id = outros_id
         self.sentence = sentence
 
+    def __repr__(self):
+        return f'<Tweet: "{self.sentence}">'
+
 
 class Content:
-    sentence = Column(Text)
-    tone = Column(VARCHAR(20))
-    used = Column(Boolean)
-    uses = Column(Integer)
+    sentence = Column(Text, nullable=False)
+    tone = Column(VARCHAR(20), nullable=False)
+    used = Column(Boolean, nullable=False, default=False)
+    uses = Column(Integer, nullable=False, default=0)
+    deleted = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, sentence, tone, used, uses):
         self.sentence = sentence
         self.tone = tone
         self.used = used
         self.uses = uses
+        self.deleted = False
 
 
 class Intro(Content, base):
@@ -50,7 +55,7 @@ class Intro(Content, base):
 class Forecast(Content, base):
     __tablename__ = 'forecasts'
     forecasts_id = Column(Integer, primary_key=True)
-    n_selections = Column(Integer)
+    n_selections = Column(Integer, nullable=False)
 
     def __init__(self, sentence, tone, used, uses, n_selections):
         super().__init__(sentence, tone, used, uses)
@@ -69,14 +74,14 @@ class Outro(Content, base):
 
 
 class TweetDB:
-    def __init__(self):
+    def __init__(self, db_uri=TweetConfig.DB_URI):
         self.engine = None
         self.session = None
 
-        self.connect()
+        self.connect(db_uri)
 
-    def connect(self):
-        self.engine = create_engine(os.getenv("PG_DB_URI"))
+    def connect(self, db_uri):
+        self.engine = create_engine(db_uri)
         Session = sessionmaker(self.engine)
         self.session = Session()
 
@@ -99,15 +104,24 @@ class TweetDB:
             raise ValueError
 
     def remove_sentence(self, table, record_id):
-        pass
+        record_to_delete = self.session.query(table).get(record_id)
+        if record_to_delete:
+            record_to_delete.deleted = True
+            self.session.commit()
+            print("Successful deletion")
+        else:
+            raise ValueError
 
     def choose_from_unused(self, table, tone, n_selections=0):
         if n_selections:
             unused_records = self.session.query(table).filter(table.used==False,
+                                                              table.deleted==False,
                                                               table.tone==tone,
                                                               table.n_selections==n_selections).all()
         else:
-            unused_records = self.session.query(table).filter(table.used==False, table.tone==tone).all()
+            unused_records = self.session.query(table).filter(table.used==False,
+                                                              table.deleted==False,
+                                                              table.tone==tone).all()
 
         if unused_records:
             random_record = random.choice(unused_records)
@@ -117,9 +131,11 @@ class TweetDB:
 
         else:
             if n_selections:
-                q = self.session.query(table).filter(table.tone == tone, table.n_selections==n_selections)
+                q = self.session.query(table).filter(table.tone == tone,
+                                                     table.deleted == False,
+                                                     table.n_selections==n_selections)
             else:
-                q = self.session.query(table).filter(table.tone == tone)
+                q = self.session.query(table).filter(table.tone == tone, table.deleted==False)
             # Reset "used" column, i.e. set all to False
             q.update({table.used: False})
             records = q.all()
@@ -129,6 +145,11 @@ class TweetDB:
             self.session.commit()
 
         return random_record
+
+    def add_tweet(self, intro, forecast, outro, tweet, date=datetime.datetime.now()):
+        new_tweet = Tweet(date, intro.intros_id, forecast.forecasts_id, outro.outros_id, tweet)
+        self.session.add(new_tweet)
+        self.session.commit()
 
     def form_tweet(self, tone, n_selections):
         intro = self.choose_from_unused(Intro, tone)
@@ -148,4 +169,10 @@ class TweetDB:
 
     def _reset_table(self, table):
         self.session.query(table).update({table.uses: 0, table.used: False})
+        self.session.commit()
+
+    def _clear_table(self, table):
+        all_records = self.session.query(table).all()
+        for record in all_records:
+            self.session.delete(record)
         self.session.commit()

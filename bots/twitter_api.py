@@ -1,6 +1,6 @@
 import tweepy
 import logging
-import os
+from config import CredentialsConfig
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -14,14 +14,9 @@ logger.addHandler(stream_handler)
 
 
 def create_api():
-    """Reads authentication credentials from environment variables and creates the Tweepy API object"""
-    consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
-    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
-    access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-    access_token_secret = os.getenv("TWITTER_TOKEN_SECRET")
-
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
+    """Creates the Tweepy API object"""
+    auth = tweepy.OAuthHandler(CredentialsConfig.TWITTER_CONSUMER_KEY, CredentialsConfig.TWITTER_CONSUMER_SECRET)
+    auth.set_access_token(CredentialsConfig.TWITTER_ACCESS_TOKEN, CredentialsConfig.TWITTER_TOKEN_SECRET)
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
     
     try:

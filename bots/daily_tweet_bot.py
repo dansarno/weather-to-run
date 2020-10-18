@@ -45,8 +45,7 @@ def daily_tweet(api_obj, method, debug=False):
     fname = f"dashboards/dashboard_{tomorrow.date.strftime('%d-%m-%y')}.jpg"
     forecast.plot_scores(tomorrow, order, to_show=debug, filename=fname)
 
-    tweet_templates = tweet_composer.get_tweet_templates("bots/tweet_content.yaml")
-    tweet_text = tweet_composer.compose_tweet(choices, tone, tweet_templates)
+    tweet_text = tweet_composer.compose_tweet(choices, tone)
 
     if not debug:
         # Upload media
