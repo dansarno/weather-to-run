@@ -5,6 +5,7 @@ from sqlalchemy import Column, Text, Boolean, Integer, VARCHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import TweetConfig
+from urllib.parse import urlparse
 
 base = declarative_base()
 
@@ -77,11 +78,17 @@ class TweetDB:
     def __init__(self, db_uri=TweetConfig.DB_URI):
         self.engine = None
         self.session = None
+        self.uri = db_uri
 
-        self.connect(db_uri)
+        self.connect()
 
-    def connect(self, db_uri):
-        self.engine = create_engine(db_uri)
+    def __repr__(self):
+        url_components = urlparse(self.uri)
+        dbname = url_components.path[1:]
+        return f'<db: "{dbname}">'
+
+    def connect(self):
+        self.engine = create_engine(self.uri)
         Session = sessionmaker(self.engine)
         self.session = Session()
 
