@@ -7,9 +7,6 @@ Using data from OpenWeather, this simple Twitter bot scores the next day's weath
 on a judgement of the best conditions for running) and informs the bot's Twitter followers what time 
 of the day is best to go out.
 
-The format of these tweets are: text status with the best time of the day for running along with a 
-"dashboard" image with additional information of the next day's weather.
-
 #### Example Tweet
 
 Status Update:
@@ -99,9 +96,9 @@ time.
 
 TimePeriods also have the attribute "alert level". This is a discretisation and simplified categorisation of the 
 time-varying scores for each weather parameter. These three levels are:
-- Green - good weather
-- Amber - not the best but manageable weather
-- Red - bad weather
+- 🟢 Green - good weather
+- 🟡 Amber - not the best but manageable weather
+- 🔴 Red - bad weather
 
 ### Tweet Generator
 
