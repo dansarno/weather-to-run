@@ -79,7 +79,7 @@ class WeatherConfig:
     }
 
     ALERT_BANDS = {
-        "Green": [5.5, 9.0],
-        "Amber": [2.5, 5.4],
-        "Red": [0.0, 2.4]
+        "Green": [6.5, 9.0],
+        "Amber": [3.5, 6.4],
+        "Red": [0.0, 3.4]
     }
