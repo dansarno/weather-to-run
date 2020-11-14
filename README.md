@@ -83,6 +83,7 @@ most useful to assess the best running conditions are incorporated into the mode
 Encapsulation of the API response allows for more convenient handling of hours and days, as well as the addition of
 any arbitrary period of the time (morning, afternoon and evening) with the same interface, attributes and methods.
 The following is the UML class diagram:
+
 ![](assets/readme_assets/UML_class_diagram.jpg)
 
 A TimeElement is the "base" class. Any portion of time is a form of TimeElement and has all of the weather parameters
