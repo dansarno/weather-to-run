@@ -10,3 +10,4 @@ venv/*
 .idea
 *.svg
 *.pdn
+*.gliffy
